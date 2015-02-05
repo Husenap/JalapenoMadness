@@ -124,6 +124,7 @@ requirejs([
 	function createPlayerShadow(){
 		var shadow = game.add.sprite(32, 32, 'juan');
 		game.physics.enable(shadow, Phaser.Physics.ARCADE);
+		shadow.body.gravity.y = 0;
 		shadow.anchor.setTo(0.5, 0.5);
 		shadow.animations.add('left', [0, 1, 2, 3], 10, true);
 		shadow.animations.add('right', [5, 6, 7, 8], 10, true);
