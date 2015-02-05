@@ -100,10 +100,10 @@ requirejs([
 		game.physics.arcade.collide(player, players);
 
 		player.body.velocity.x = 0;
-		if(test.input.keyboard.isDown(Phaser.Keyboard.D)){
+		if(game.input.keyboard.isDown(Phaser.Keyboard.D)){
 			player.body.velocity.x=speed;
 			player.animations.play('right');
-		}else if(test.input.keyboard.isDown(Phaser.Keyboard.A)){
+		}else if(game.input.keyboard.isDown(Phaser.Keyboard.A)){
 			player.body.velocity.x=-speed;
 			player.animations.play('left');
 		}else{
