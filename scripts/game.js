@@ -3,7 +3,7 @@
 var ws;
 var connected = false;
 var player;
-var onlinePlayers = Array();
+var onlinePlayers = [];
 var players;
 
 requirejs([
@@ -49,7 +49,6 @@ requirejs([
 		}
 		ws.onmessage = function(msg){
 			var j = JSON.parse(msg.data);
-			console.log(j);
 			switch(j.id){
 				case 1:
 					onlinePlayers[j.uid] = createPlayerShadow();
@@ -68,7 +67,8 @@ requirejs([
 				break;
 				case 3:
 					if(onlinePlayers[j.uid]){
-						players[j.uid] = onlinePlayers[j.uid] = null;
+						players.remove(j.uid);
+						onlinePlayers[j.uid] = null;
 					}
 				break;
 			}
@@ -100,10 +100,10 @@ requirejs([
 		game.physics.arcade.collide(player, players);
 
 		player.body.velocity.x = 0;
-		if(cursors.right.isDown){
+		if(test.input.keyboard.isDown(Phaser.Keyboard.D)){
 			player.body.velocity.x=speed;
 			player.animations.play('right');
-		}else if(cursors.left.isDown){
+		}else if(test.input.keyboard.isDown(Phaser.Keyboard.A)){
 			player.body.velocity.x=-speed;
 			player.animations.play('left');
 		}else{
