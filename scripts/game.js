@@ -96,8 +96,8 @@ requirejs([
 	}
 	function update(){
 
-		game.physics.arcade.collide(player, layer);
-		game.physics.arcade.collide(player, players);
+		game.physics.arcade.collide(players, layer);
+		game.physics.arcade.collide(players);
 
 		player.body.velocity.x = 0;
 		if(game.input.keyboard.isDown(Phaser.Keyboard.D)){
