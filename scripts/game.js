@@ -28,9 +28,13 @@ requirejs([
 		ws = new WebSocket("ws://echo.websocket.org/");
 		ws.onopen = function(){
 			alert("Connected!");
+			ws.send("Connected");
 		}
 		ws.onerror = function(error){
 			alert(error);
+		}
+		ws.onmessage = function(e){
+			alert(e.data);
 		}
 
 		game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -55,8 +59,8 @@ requirejs([
 		juan.body.maxVelocity.y = 500;
 		juan.body.collideWorldBounds = true;
 		
-		juan.animations.add('left', [0, 1, 2, 3], 10, true);
-		juan.animations.add('right', [5, 6, 7, 8], 10, true);
+		juan.animations.add('left', [0, 1, 2, 3], 60, true);
+		juan.animations.add('right', [5, 6, 7, 8], 60, true);
 
 		game.camera.follow(juan);
 		cursors = game.input.keyboard.createCursorKeys();
