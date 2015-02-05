@@ -2,8 +2,8 @@
 
 define(function() {
 	var Settings = {
-		'WIDTH': 256,
-		'HEIGHT': 256
+		'WIDTH': 512,
+		'HEIGHT': 512
 	}
 	return Settings;
 });

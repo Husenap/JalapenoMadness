@@ -97,7 +97,6 @@ requirejs([
 	function update(){
 
 		game.physics.arcade.collide(players, layer);
-		game.physics.arcade.collide(players);
 
 		player.body.velocity.x = 0;
 		if(game.input.keyboard.isDown(Phaser.Keyboard.D)){
@@ -115,8 +114,7 @@ requirejs([
 		if(connected)ws.send(JSON.stringify( {'x': player.x, 'y': player.y} ));
 	}
 	function render(){
-	    players.forEachAlive(renderGroup, this);
-	    game.debug.body(player);
+	    //players.forEachAlive(renderGroup, this);
 	}
 	function renderGroup(member){
 		game.debug.body(member);
@@ -124,7 +122,6 @@ requirejs([
 	function createPlayerShadow(){
 		var shadow = game.add.sprite(32, 32, 'juan');
 		game.physics.enable(shadow, Phaser.Physics.ARCADE);
-		shadow.body.gravity.y = 0;
 		shadow.anchor.setTo(0.5, 0.5);
 		shadow.animations.add('left', [0, 1, 2, 3], 10, true);
 		shadow.animations.add('right', [5, 6, 7, 8], 10, true);
