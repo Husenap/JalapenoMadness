@@ -115,7 +115,11 @@ requirejs([
 		if(connected)ws.send(JSON.stringify( {'x': player.x, 'y': player.y} ));
 	}
 	function render(){
-	    //game.debug.body(player);
+	    players.forEachAlive(renderGroup, this);
+	    game.debug.body(player);
+	}
+	function renderGroup(member){
+		game.debug.body(member);
 	}
 	function createPlayerShadow(){
 		var shadow = game.add.sprite(32, 32, 'juan');
