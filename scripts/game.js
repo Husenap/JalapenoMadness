@@ -25,7 +25,7 @@ requirejs([
 
 	function create(){
 
-		ws = new WebSocket("ws://echo.websocket.org/");
+		ws = new WebSocket("ws://scribblehost.ws:1035/jalamad362250");
 		ws.onopen = function(){
 			alert("Connected!");
 			ws.send("Connected");
