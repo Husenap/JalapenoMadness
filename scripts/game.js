@@ -66,6 +66,11 @@ requirejs([
 						onlinePlayers[j.uid].y = j.y;
 					}
 				break;
+				case 3:
+					if(onlinePlayers[j.uid]){
+						players[j.uid] = onlinePlayers[j.uid] = null;
+					}
+				break;
 			}
 		}
 		ws.onerror = function(error){
@@ -92,7 +97,7 @@ requirejs([
 	function update(){
 
 		game.physics.arcade.collide(player, layer);
-		game.physics.arcade.collide(players);
+		game.physics.arcade.collide(player, players);
 
 		player.body.velocity.x = 0;
 		if(cursors.right.isDown){
