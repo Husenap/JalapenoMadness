@@ -1,5 +1,7 @@
 "use strict";
 
+var ws;
+
 requirejs([
 	'./settings'
 ], function (Settings) {
@@ -21,7 +23,6 @@ requirejs([
 	var cursors;
 	var jumpButton;
 	var bg;
-	var ws = false;
 
 	function create(){
 
@@ -35,6 +36,9 @@ requirejs([
 		}
 		ws.onmessage = function(e){
 			alert(e.data);
+		}
+		ws.onclose = function(){
+			alert("Disconnected!");
 		}
 
 		game.physics.startSystem(Phaser.Physics.ARCADE);
