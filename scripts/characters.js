@@ -2,11 +2,11 @@
 
 define(function(){
 	var characters = {
-		JUAN: function(game){
+		JUAN: function(game, hasPhysics){
 			var shadow = game.add.sprite(96, 256, 'juan');
 			shadow.debug = true;
 			shadow.anchor.setTo(0.5, 0.5);
-			game.physics.enable(shadow, Phaser.Physics.ARCADE);
+			if(hasPhysics)game.physics.enable(shadow, Phaser.Physics.ARCADE);
 			shadow.body.gravity.y = 982;
 			shadow.body.collideWorldBounds = true;
 			shadow.body.setSize(20, 32);

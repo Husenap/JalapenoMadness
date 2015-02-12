@@ -67,14 +67,14 @@ requirejs([
 			var j = JSON.parse(msg.data);
 			switch(j.id){
 				case 1:
-					onlinePlayers[j.uid] = Chars.JUAN(game);
+					onlinePlayers[j.uid] = Chars.JUAN(game, false);
 					players.add(onlinePlayers[j.uid]);
 				break;
 				case 2:
 					if(onlinePlayers[j.uid]){
 						updateShadow(onlinePlayers[j.uid], j);
 					}else{
-						onlinePlayers[j.uid] = Chars.JUAN(game);
+						onlinePlayers[j.uid] = Chars.JUAN(game, false);
 						players.add(onlinePlayers[j.uid]);
 						updateShadow(onlinePlayers[j.uid], j);
 					}
@@ -94,7 +94,7 @@ requirejs([
 			alert("Disconnected!");
 		}
 
-		player = Chars.JUAN(game);
+		player = Chars.JUAN(game, true);
 		players.add(player);
 
 		game.camera.follow(player);
