@@ -21,8 +21,10 @@ define(function(){
 			shadow.animations.add('jump-down-left', [27], 10, true);
 			shadow.animations.add('jump-up-right', [28], 10, true);
 			shadow.animations.add('jump-down-right', [29], 10, true);
-			shadow.animations.add('shoot-left', [30, 31, 32], 10, true);
-			shadow.animations.add('shoot-right', [33, 34, 35], 10, true);
+			shadow.animations.add('shoot-left', [30, 31, 32], 6, true);
+			shadow.animations.add('shoot-right', [33, 34, 35], 6, true);
+			shadow.animations.add('climbing-idle', [36], 10);
+			shadow.animations.add('climbing', [37, 38], 10);
 			shadow.onLadder = false;
 			shadow.canJump = false;
 			return shadow;

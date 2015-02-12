@@ -122,7 +122,7 @@ requirejs([
 			fire();
 			return;
 		}
-		player.body.velocity.x = 0;
+		//player.body.velocity.x = 0;
 		if(ladderOverlap(player, ladders)){
 			if(!player.onLadder){
 				if(cursors.up.isDown || cursors.down.isDown)player.onLadder = player.canJump = true;
@@ -136,17 +136,23 @@ requirejs([
 		}
 		if(!player.onLadder){
 			game.physics.arcade.collide(players, midground);
-			if(cursors.right.isDown){
-			player.body.velocity.x=speed;
-			dir = anim = 'right'
-		}else if(cursors.left.isDown){
-			player.body.velocity.x=-speed;
-			dir = anim = 'left';
-		}else{
-			if(dir.indexOf('idle') == -1 && player.body.onFloor()){
-				anim = 'idle-' + dir;
+				if(cursors.right.isDown){
+				player.body.velocity.x=speed;
+				dir = anim = 'right'
+			}else if(cursors.left.isDown){
+				player.body.velocity.x=-speed;
+				dir = anim = 'left';
+			}else{
+				if(dir.indexOf('idle') == -1 && player.body.onFloor()){
+					anim = 'idle-' + dir;
+				}
 			}
-		}
+		}else{
+			if(player.body.velocity.y == 0){
+				anim = 'climbing-idle';
+			}else{
+				anim = 'climbing';
+			}
 		}
 		if(player.body.onFloor() || player.canJump){
 			if(jumpButton.isDown){
@@ -199,7 +205,10 @@ requirejs([
         	var tile = mapData[i];
         	if(!tile.faceLeft && !tile.faceRight && !tile.faceBottom && !tile.faceTop)continue;
         	tile.position = {x: tile.left, y: tile.top};
-        	if(game.physics.arcade.intersects(player, tile)){
+        	if(game.physics.arcade.intersects(sprite, tile)){
+        		if(sprite.onLadder){
+					sprite.body.position.x = tile.position.x + 6;
+        		}
         		return true;
         	}
         }
