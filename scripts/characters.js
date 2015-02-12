@@ -6,11 +6,13 @@ define(function(){
 			var shadow = game.add.sprite(96, 256, 'juan');
 			shadow.debug = true;
 			shadow.anchor.setTo(0.5, 0.5);
-			if(hasPhysics)game.physics.enable(shadow, Phaser.Physics.ARCADE);
-			shadow.body.gravity.y = 982;
-			shadow.body.collideWorldBounds = true;
-			shadow.body.setSize(20, 32);
-			shadow.body.drag.x = 500;
+			if(hasPhysics){
+				game.physics.enable(shadow, Phaser.Physics.ARCADE);
+				shadow.body.gravity.y = 982;
+				shadow.body.collideWorldBounds = true;
+				shadow.body.setSize(20, 32);
+				shadow.body.drag.x = 500;
+			}
 			shadow.animations.add('left', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 30, true);
 			shadow.animations.add('right', [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], 30, true);
 			shadow.animations.add('idle-left', [24], 10, true);
