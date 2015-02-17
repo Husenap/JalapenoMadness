@@ -30,7 +30,7 @@ requirejs([
 	var collisionExclusion = [10, 11, 12, 13, 14, 15, 16, 17, 31, 32, 33, 34, 46, 47, 48, 49, 50, 51, 69, 70, 120, 121];
 	var speed = 150;
 	var cursors;
-	var shootButton
+	var shootButton, danceButton;
 	var bg;
 	var dir = 'right';
 	var anim = 'idle-'+dir;
@@ -105,6 +105,7 @@ requirejs([
 		cursors = game.input.keyboard.createCursorKeys();
 		jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 		shootButton = game.input.keyboard.addKey(Phaser.Keyboard.X);
+		danceButton = game.input.keyboard.addKey(Phaser.Keyboard.D);
 	}
 	function update(){
 
@@ -166,6 +167,7 @@ requirejs([
 				anim = 'jump-down-'+dir;
 			}
 		}
+		if(danceButton.isDown)anim = 'dance';
 		player.animations.play(anim);
 		if(connected)ws.send(JSON.stringify( {'x': player.x, 'y': player.y, 'anim': anim} ));
 	}
