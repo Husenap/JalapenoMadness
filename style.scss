@@ -1,0 +1,234 @@
+$BaseColor: #fc6;
+
+html{
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+body{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	font-family: "Open Sans", Arial, sans-serif;
+	background: url("img/bg.png") 0 0 / 768px 432px repeat;
+	z-index: -2;
+	&:before{
+		content: "";
+		position: fixed;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background: rgba(darken($BaseColor, 55%), 0.8);
+		z-index: -1;
+	}
+}
+/*********** HEADER STYLING ***********/
+header{
+	text-align: center;
+	margin: 24px 30px;
+
+	h1 a{
+		text-decoration: none;
+		color: $BaseColor;
+		font-family: Luminari;
+		margin: 0;
+		padding: 0;
+		font-size: 4rem;
+		transition: 500ms ease-in-out;
+		&:hover{
+			color: darken($BaseColor, 50%);
+			$offset: 1px;
+			text-shadow: -$offset (-$offset) $offset lighten($BaseColor, 10%),	// TOP-LEFT
+						-$offset $offset $offset darken($BaseColor, 10%),		// BOTTOM-LEFT
+						$offset $offset $offset darken($BaseColor, 30%),		// BOTTOM-RIGHT
+						$offset (-$offset) $offset darken($BaseColor, 10%);	// TOP-RIGHT
+		}
+	}
+	h1, h2{
+		margin: 0;
+		padding: 0;
+	}
+	h2{
+		color: $BaseColor;
+		font-style: "Trebuchet MS";
+	}
+}
+/*---------- HEADER STYLING ----------*/
+#Wrapper{
+	display: block;
+	width: 960px;
+	height: auto;
+	margin: 0 auto 50px;
+	padding: 0;
+	background: darken($BaseColor, 10%);
+	border-radius: 10px;
+	overflow: hidden;
+}
+/*********** LIST STYLING ***********/
+ul{
+	margin: 0;
+	padding: 0;
+	width: auto;
+	min-height: 40px;
+	text-align: center;
+	li{
+		display: inline-block;
+		list-style: none;
+		a{
+			display: block;
+			text-decoration: none;
+			font-size: 20pt;
+		}
+	}
+}
+/*---------- LIST STYLING ----------*/
+/*********** NAV BAR STYLING ***********/
+nav{
+	display: block;
+	background: darken($BaseColor, 20%);
+	ul li a{
+		color: darken($BaseColor, 60%);
+		padding: 10px 20px;
+		margin: 0 auto;
+		transition: 250ms ease-in-out;
+		&:hover{
+			color: darken($BaseColor, 40%);
+		}
+	}
+}
+/*---------- NAV BAR STYLING ----------*/
+/*********** CONTAINER STYLING ***********/
+#Container{
+	max-width: 100%;
+	min-height: 100px;
+	margin: 50px;
+}
+#ProjectList{
+	li{
+		position: relative;
+		margin-bottom: 30px;
+		a{
+			position: relative;
+			max-height: 400px;
+			overflow: hidden;
+			border-radius: 5px;
+			&, * {transition: 250ms cubic-bezier(0.680, -0.550, 0.265, 1.550);}
+			span{
+				position: absolute;
+				clear: both;
+				bottom: 0;
+				left: 0;
+				width: 100%;
+				background: rgba(0, 0, 0, 0.5);
+				h3{
+					float: left;
+					color: white;
+					font-family: Luminari;
+					font-size: 1rem;
+					padding: 5px 10px;
+					margin: 0;
+				}
+				#methods{
+					float: right;
+					min-height: 0;
+					height: 22px;
+					padding: 5px 10px;
+					margin: 0;
+					li{
+						margin: 0;
+						padding: 0;
+						width: 22px;
+						height: inherit;
+					}
+					.opengl{background: url("img/opengl.svg") center center no-repeat;}
+					.cpp{background: url("img/cpp.svg") center center no-repeat;}
+					.js{background: url("img/js.svg") center center no-repeat;}
+					.phaser{background: url("img/phaser.svg") center center no-repeat; title:"Phaser";}
+				}
+			}
+			img{
+				transition: none;
+				position: relative;
+				max-width: 100%;
+			}
+			&:hover{
+				border-radius: 10px;
+				span{
+					bottom: 20px;
+					background: black;
+					h3{
+						color: $BaseColor;
+						padding: 15px 10px;
+					}
+				}
+				#methods {
+					height: 42px;
+					padding: 5px 10px;
+					li{
+						width: 42px;
+					}
+				}
+			}
+		}
+	}
+}
+/*---------- CONTAINER STYLING ----------*/
+/*********** FOOTER STYLING ***********/
+nav{
+	display: block;
+	background: darken($BaseColor, 20%);
+	ul li a{
+		color: darken($BaseColor, 60%);
+		padding: 10px 20px;
+		margin: 0 auto;
+		transition: 250ms ease-in-out;
+		&:hover{
+			color: darken($BaseColor, 40%);
+		}
+	}
+}
+footer{
+	display: block;
+	height: 100px;
+	line-height: 100px;
+	background: darken($BaseColor, 20%);
+	#footWrapper{margin: 10px;}
+	ul{
+		text-align: right;
+		li{
+			vertical-align: middle;
+		}
+	}
+	span{
+		position: absolute;
+		vertical-align: middle;
+	}
+	a{
+		width: 50px;
+		height: 50px;
+		transition: 250ms cubic-bezier(0.680, -0.550, 0.265, 1.550);
+	}
+	.facebookItem a{
+		background: url("img/facebook.svg") 0 0 / 50px 100px no-repeat;
+		&:hover{
+			background: url("img/facebook.svg") 0 -50px / 50px 100px no-repeat;
+		}
+	}
+	.githubItem a{
+		background: url("img/github.svg") 0 0 / 50px 100px no-repeat;
+		&:hover{
+			background: url("img/github.svg") 0 -50px / 50px 100px no-repeat;
+		}
+	}
+	.trelloItem a{
+		background: url("img/trello.svg") 0 0 / 50px 100px no-repeat;
+		&:hover{
+			background: url("img/trello.svg") 0 -50px / 50px 100px no-repeat;
+		}
+	}
+}
+/*---------- FOOTER STYLING ----------*/
