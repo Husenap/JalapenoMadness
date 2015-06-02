@@ -11,7 +11,6 @@ define([
 	var preview;
 	var bag = ["I", "O", "T", "S", "Z", "J", "L"];
 	var stack = [];
-	stack = _.shuffle(bag);
 	var curPiece;
 	var nextPiece;
 	var timer = 0;
@@ -32,6 +31,7 @@ define([
 		_.times(Settings.HEIGHT, function(){self.lines.push([])});
 		timer = 0;
 		this.timerInterval = window.setInterval(updateTimer, 1000);
+		stack = _.shuffle(bag);
 		this.newPiece();
 	}
 	Level.prototype.newPiece = function(){	
