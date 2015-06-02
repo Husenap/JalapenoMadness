@@ -7,18 +7,21 @@ var trunk, top;
 var group;
 var player;
 var cursors;
-var moving = false;
+var hl;
 
 requirejs([
 	'./settings',
-	'./utils'
-], function(Settings, Utils){
+	'./utils',
+	'./characters'
+], function(Settings, Utils, Characters){
 
 	Utils.game = game = new Phaser.Game(Settings.WIDTH, Settings.HEIGHT, Phaser.AUTO, '', {preload:preload, create:create, update:update, render:render}, false, false);
 
 	function preload(){
 		game.load.image('dude', 'assets/img/dude.png');
 		game.load.image('tileset', 'assets/img/tileset.png');
+		game.load.image('hl', 'assets/img/highlight.png');
+		game.load.spritesheet('male', 'assets/img/male_char.png', 32, 48);
 		game.load.tilemap('map', 'assets/tilemaps/maps/test-map.json', null, 1);
 	}
 	function create(){
@@ -30,37 +33,17 @@ requirejs([
 		map.createLayer("Tile Layer 2");
 		trunk = map.createLayer("Tile Layer 3");
 		
-		player = game.add.sprite(32, 32, 'dude');
-		player.anchor.setTo(0, 2/3);
+		player = Characters.Player(game);
+
 		top = map.createLayer("Tile Layer 4");
 		game.camera.follow(player);
 		cursors = game.input.keyboard.createCursorKeys();
+		hl = game.add.sprite(0, 0, 'hl');
 	}
 	function update(){
-		if(!moving){
-			if (cursors.left.isDown){
-				if(!trunk.getTiles(player.x-32, player.y, 32, 32, true, true).length){
-					moving = true;
-			        game.add.tween(player).to({x: '-32'}, 250, Phaser.Easing.Linear.None, true).onComplete.add(function(){moving = false;}, this);
-		    	}
-		    }else if (cursors.right.isDown){
-		    	if(!trunk.getTiles(player.x+32, player.y, 32, 32, true, true).length){
-		    		moving = true;
-		        	game.add.tween(player).to({x: '32'}, 250, Phaser.Easing.Linear.None, true).onComplete.add(function(){moving = false;}, this)
-		        }
-		    }else if (cursors.up.isDown){
-		    	if(!trunk.getTiles(player.x, player.y-32, 32, 32, true, true).length){
-			    	moving = true;
-			        game.add.tween(player).to({y: '-32'}, 250, Phaser.Easing.Linear.None, true).onComplete.add(function(){moving = false;}, this)
-		    	}
-		    }else if (cursors.down.isDown){
-		    	if(!trunk.getTiles(player.x, player.y+32, 32, 32, true, true).length){
-			    	moving = true;
-			        game.add.tween(player).to({y: '32'}, 250, Phaser.Easing.Linear.None, true).onComplete.add(function(){moving = false;}, this)
-			    }
-		    }
-		}
+		player.interact(cursors, trunk);
 		group.sort('y', Phaser.Group.SORT_ASCENDING);
+		hl.position = Utils.mapPos(map);
 	}
 	function render(){
 
