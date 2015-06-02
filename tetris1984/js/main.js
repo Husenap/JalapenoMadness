@@ -53,7 +53,13 @@ define([
 
 		game = new Game(tiles, preview);
 	}
-	
+	$(window).resize(function(){
+		console.log("RESIZE");
+		$("#sidebar").css('top', $("#wrapper").position().top);
+		$("#sidebar").css('left', $("#wrapper").position().left-$("#sidebar").width());
+		$("#preview").css('top', $("#sidebar").position().top+$("#wrapper").height()/2);
+		$("#preview").css('left', $("#wrapper").position().left-$("#preview").width());
+	});
 	async.series({
 		drawGrid: function(next){
 			start();

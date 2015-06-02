@@ -14,11 +14,11 @@ define([
 	stack = _.shuffle(bag);
 	var curPiece;
 	var nextPiece;
-	var lines = [];
 	var timer = 0;
-	_.times(Settings.HEIGHT, function(){lines.push([])});
+	var self;
 
 	var Level = function(t, p){
+		self = this;
 		if(!tiles)tiles = t;
 		if(!preview)preview = p;
 		$("#lines").html(0);
@@ -28,6 +28,9 @@ define([
 		this.gameOver = false;
 		curPiece = null;
 		nextPiece = null;
+		this.lines = [];
+		_.times(Settings.HEIGHT, function(){self.lines.push([])});
+		timer = 0;
 		this.timerInterval = window.setInterval(updateTimer, 1000);
 		this.newPiece();
 	}
@@ -43,18 +46,17 @@ define([
 		nextPiece.update();
 	}
 	Level.prototype.handleLockedPiece = function(piece){
-		var self = this;
 		var score = 0;
 		var linesCleared = 0;
 		var modified = [];
 		_.forEach(piece.blocks, function(b){
 			if(b.pos.y>=0){
-				lines[b.pos.y][b.pos.x] = b;
+				self.lines[b.pos.y][b.pos.x] = b;
 				b.curr.attr('solid', 'true');
 				modified.push(b.pos.y);
 			}else{
 				self.gameOver = true;
-				console.log("GAME OVER");
+				window.clearInterval(self.timerInterval);
 			}
 		});
 		modified = _.sortBy(_.uniq(modified), function(n){return -n;});
@@ -75,13 +77,13 @@ define([
 		$('#score').html(parseInt($('#score').html())+score*linesCleared);
 	}
 	Level.prototype.clearLine = function(line){
-		_.forEach(lines[line], function(block){
+		_.forEach(self.lines[line], function(block){
 			if(block)block.curr.attr('solid', '');
 		});
-		lines[line] = [];
+		self.lines[line] = [];
 		_.times(line, function(n, yPos){
-			lines[line-n] = _.clone(lines[line-n-1]);
-			_.forEach(lines[line-n], function(block, xPos){
+			self.lines[line-n] = _.clone(self.lines[line-n-1]);
+			_.forEach(self.lines[line-n], function(block, xPos){
 				if(block){
 					block.curr.attr('solid', '');
 					block.exactUpdate({x: xPos, y: line-n});
@@ -97,7 +99,7 @@ define([
 	Level.prototype.draw = function(){
 		curPiece.draw();
 		
-		_.forEach(lines, function(line){
+		_.forEach(self.lines, function(line){
 			_.forEach(line, function(block){
 				if(block)block.draw();
 			});

@@ -6,19 +6,22 @@
 	<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+	<input type="button" value="back" onclick="window.location.replace(window.location.origin)" style="z-index: 1000; position: absolute;">
 	<div id="overlay"></div>
 	<a href="javascript:toggleStyle()" id="timeTravel">1984</a>
-
-
 	<div id="sidebar">
 		<span>FULL LINES: <span id="lines">0</span></span><br>
 		<span>LEVEL: <span id="level">1</span></span><br>
-		<span>SCORE: <span id="score">308</span></span><br>
-		<span>TIME: <span id="time">2:19</span></span>
+		<span>SCORE: <span id="score">0</span></span><br>
+		<span>TIME: <span id="time">0:00</span></span>
 	</div>
 	<div id="preview"></div>
 	<div id="wrapper">
 		<div id="grid"></div>
+	</div>
+	<div id="gameOver">
+		<span>GAME OVER</span><br>
+		<span>PRESS [R] TO RESTART</span>
 	</div>
 	<script data-main="js/init.js" src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.17/require.min.js"></script>
 </body>

@@ -166,9 +166,16 @@ define([
 		}
 	}
 	Piece.prototype.rotate = function(cw){
+		var rotate = true;
+		var self = this;
 		_.forEach(this.blocks, function(b){
-			b.rotate(cw);
+			if(!b.predictRotation(cw, self.pos))rotate = false;
 		});
+		if(rotate){
+			_.forEach(this.blocks, function(b){
+				b.rotate(cw);
+			});
+		}
 	}
 	Piece.prototype.addBlock = function(_relpos){
 		var block = new Block(this.tiles);

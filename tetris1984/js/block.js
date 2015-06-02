@@ -39,6 +39,21 @@ define([
 			this.relpos.x = temp;
 		}
 	}
+	Block.prototype.predictRotation = function(cw, origin){
+		var tempPos = {};
+		if(cw){
+			//Clock-Wise Rotation
+			tempPos = {x: origin.x-this.relpos.y, y: origin.y+this.relpos.x};
+		}else{
+			//Counter-Clock-Wise Rotation
+			tempPos = {x: origin.x+this.relpos.y, y: origin.y-this.relpos.x};
+		}
+		if(this.tiles[tempPos.x] != undefined &&
+			this.tiles[tempPos.x][tempPos.y] != undefined){
+			return (this.tiles[tempPos.x][tempPos.y].attr('solid') != "true");
+		}
+		return true;
+	}
 
 	return Block;
 });
