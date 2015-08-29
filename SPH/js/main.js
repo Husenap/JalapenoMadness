@@ -5,7 +5,7 @@ define([
 	"./ball"
 ], function(PIXI, Ball){
 
-	var renderer = new PIXI.autoDetectRenderer(1280, 720, {antialias: false});
+	var renderer = new PIXI.autoDetectRenderer(600, 400, {antialias: false});
 	var maxPtcls = 1000000;
 	var stage = new PIXI.ParticleContainer(maxPtcls, [false, true, false, false, false]);
 
