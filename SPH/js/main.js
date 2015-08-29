@@ -5,8 +5,8 @@ define([
 	"./ball"
 ], function(PIXI, Ball){
 
-	var renderer = new PIXI.autoDetectRenderer(800, 600, {antialias: false});
-	var maxPtcls = 500000;
+	var renderer = new PIXI.autoDetectRenderer(1280, 720, {antialias: false});
+	var maxPtcls = 1000000;
 	var stage = new PIXI.ParticleContainer(maxPtcls, [false, true, false, false, false]);
 
 	document.body.appendChild(renderer.view);
@@ -30,6 +30,8 @@ define([
 	var isAdding = false;
 	$(document).mousedown(function(){isAdding = true;});
 	$(document).mouseup(function(){isAdding = false;});
+	$(document).bind('touchstart',function(){isAdding = true;});
+	$(document).bind('touchend',function(){isAdding = false;});
 
 	var texture = new PIXI.Texture.fromImage("img/ball.png?bust="+(new Date()).getTime());
 
