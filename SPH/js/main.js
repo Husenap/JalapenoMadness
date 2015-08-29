@@ -6,7 +6,7 @@ define([
 ], function(PIXI, Ball){
 
 	var renderer = new PIXI.autoDetectRenderer(800, 600, {antialias: false});
-	var maxPtcls = 500000;
+	var maxPtcls = 1000000;
 	var stage = new PIXI.ParticleContainer(maxPtcls, [false, true, false, false, false]);
 
 	document.body.appendChild(renderer.view);
