@@ -6,7 +6,7 @@ define([
 ], function(PIXI, Ball){
 
 	var renderer = new PIXI.autoDetectRenderer(800, 600, {antialias: false});
-	var maxPtcls = 1000000;
+	var maxPtcls = 500000;
 	var stage = new PIXI.ParticleContainer(maxPtcls, [false, true, false, false, false]);
 
 	document.body.appendChild(renderer.view);
@@ -26,7 +26,7 @@ define([
 	var balls = [];
 	// ADD NEW BALLS
 	var count = 0;
-	var amount = 100000;
+	var amount = 10000;
 	var isAdding = false;
 	$(document).mousedown(function(){isAdding = true;});
 	$(document).mouseup(function(){isAdding = false;});
