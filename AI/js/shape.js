@@ -27,6 +27,16 @@ define([
 		ctx.restore();
 	}
 
+	Shape.Line.prototype.Set = function(a, b){
+		this.start = a||new Vector2();
+		this.end = b||new Vectro2();
+		this.dir = this.end.Sub(this.start);
+	}
+	Shape.Line.prototype.Ray = function(p, a, l){
+		this.start = p||new Vector2();
+		this.end = this.start.Add((new Vector2(Math.cos(a),Math.sin(a))).Mul(l));
+		this.dir = this.end.Sub(this.start);
+	}
 	Shape.Line.prototype.draw = function(){
 		ctx.save();
 		ctx.strokeStyle = "white";
