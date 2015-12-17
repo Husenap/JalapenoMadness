@@ -16,12 +16,20 @@ define([
 	}
 
 	Game.prototype.loop = function(){
-		if(level && !level.gameOver){
-			level.update();
-			level.clear();
-			level.draw();
-		}else{
-			$("#gameOver").slideDown();
+		if(level){
+			if(level.gameOver){
+				$("#gameOver").slideDown();
+			}else if(level.pause){
+				if($("#pause").attr("down") == "0"){
+					$("#pause").slideDown(function(){
+						$("#pause").attr("down", 1);
+					});
+				}
+			}else{
+				level.update();
+				level.clear();
+				level.draw();
+			}
 		}
 	}
 	Game.prototype.reset = function(){
@@ -39,6 +47,15 @@ define([
 		if(e.which == 82 && level.gameOver){
 			self.reset();
 			$("#gameOver").slideUp();
+		}
+		if(e.which == 80 && level.pause){
+			if($("#pause").attr("down") == "1"){
+				level.pause = false;
+				$("#pause").slideUp(function(){
+					level.startTimer();
+					$("#pause").attr("down", 0);
+				});
+			}
 		}
 	});
 

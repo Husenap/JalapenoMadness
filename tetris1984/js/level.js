@@ -25,12 +25,13 @@ define([
 		$("#score").html(0);
 		$("#time").html("0:00");
 		this.gameOver = false;
+		this.pause = false;
 		curPiece = null;
 		nextPiece = null;
 		this.lines = [];
 		_.times(Settings.HEIGHT, function(){self.lines.push([])});
 		timer = 0;
-		this.timerInterval = window.setInterval(updateTimer, 1000);
+		this.startTimer();
 		stack = _.shuffle(bag);
 		this.newPiece();
 	}
@@ -139,11 +140,17 @@ define([
 		case 17: //ctrl				ROTATE CCW
 			curPiece.rotate(false);
 			break;
+		case 80:
+			self.pause = true;
+			window.clearInterval(self.timerInterval);
 		}
 	});
 	$("body").keyup(function(e){
 		curPiece.released();
 	});
+	Level.prototype.startTimer = function(){
+		this.timerInterval = window.setInterval(updateTimer, 1000);
+	}
 	var updateTimer = function(){
 		timer++;
 		var minutes = Math.floor(timer/60);
