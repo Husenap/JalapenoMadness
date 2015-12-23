@@ -14,9 +14,22 @@ define([
 	var x = Settings.WIDTH;
 	var y = Settings.HEIGHT;
 
+	var searchVars = window.location.search.substr(1).split("&");
+	searchVars.forEach(function(n){
+		var i = n.split("=");
+		switch(i[0]){
+			case "x":
+				if(i[1] == parseInt(i[1], 10))Settings.WIDTH = x = i[1];
+			break;
+			case "y":
+				if(i[1] == parseInt(i[1], 10))Settings.HEIGHT = y = i[1];
+			break;
+		}
+	});
+
 	function start(){
 		_.times(x, function(n){tiles.push([])});
-
+		$("#grid").html("");
 		var grid = $("#grid");
 		_.times(y, function(j){
 			grid.append("<span>&lt;!</span>");
@@ -60,6 +73,7 @@ define([
 		$("#preview").css('top', $("#sidebar").position().top+$("#wrapper").height()/2);
 		$("#preview").css('left', $("#wrapper").position().left-$("#preview").width());
 	});
+
 	async.series({
 		drawGrid: function(next){
 			start();

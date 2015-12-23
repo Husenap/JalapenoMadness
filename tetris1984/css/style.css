@@ -82,3 +82,14 @@ body, html{
 	-ms-transform: translate(-50%, -50%);
 	-webkit-transform: translate(-50%, -50%);
 }
+
+/*style="z-index: 1000; position: absolute; right: 0; top: 0;"*/
+.gameModes{
+	z-index: 1000;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+.gameModes a input{
+	float: right;
+}

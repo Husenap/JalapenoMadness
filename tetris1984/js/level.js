@@ -75,7 +75,8 @@ define([
 			}
 		});
 		$('#lines').html(parseInt($('#lines').html())+linesCleared);
-		$('#score').html(parseInt($('#score').html())+score*linesCleared);
+		$('#score').html(parseInt($('#score').html())+score*linesCleared*(Settings.WIDTH/10));
+		$('#level').html(Math.floor(parseInt($('#lines').html())/10)+1);
 	}
 	Level.prototype.clearLine = function(line){
 		_.forEach(self.lines[line], function(block){
