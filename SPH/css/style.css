@@ -11,3 +11,13 @@ canvas{
 	transform: translateX(-50%);
 	border: 1px solid white;
 }
+
+#parameterList{
+	position: fixed;
+	color: lightblue;
+	background: rgba(0, 0, 0, 0.5);
+	padding: 10px;
+}
+.val{
+	color: lightgreen;
+}
