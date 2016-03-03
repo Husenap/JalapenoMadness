@@ -41,7 +41,8 @@ define([
 	$(parameterList).append("<span id='dAngle'><p>rotation angle(F/R): <span class='val'>");
 	$(parameterList).append("<span id='gravity'><p>gravity(arrows): <span class='val'>");
 	$(parameterList).append("<span id='numPtcls'><p>particles(C/A): <span class='val'>");
-	$(parameterList).append("<span id='numLines'><p>lines(D): <span class='val'>");
+	$(parameterList).append("<span id='numLines'><p>lines(D/LMB): <span class='val'>");
+	$(parameterList).append("<span id='info'>RMB for attractive force");
 	$(stats.domElement).append(parameterList);
 
 

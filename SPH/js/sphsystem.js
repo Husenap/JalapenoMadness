@@ -105,9 +105,6 @@ var Keyboard = {key:{}};
 			if(Keyboard.key["ArrowLeft"]) kGravity.x-=2;
 			if(Keyboard.key["ArrowRight"]) kGravity.x+=2;
 
-
-			updateParameterList();
-
 			if(Keyboard.key["KeyD"]){
 				linesCollision.pop();
 				Keyboard.key["KeyD"] = false;
@@ -143,7 +140,6 @@ var Keyboard = {key:{}};
 			});
 
 			drawLine();
-
 			if(particles.length){
 				timeStep = Math.min(timeStep, kDT);
 
@@ -156,6 +152,8 @@ var Keyboard = {key:{}};
 				updateVelocity(timeStep);
 				updatePosition(timeStep);
 			}
+
+			updateParameterList();
 		};
 
 		//Simulation Functions
@@ -170,7 +168,7 @@ var Keyboard = {key:{}};
 					if(dir.Equal(new Vector2()))return;
 					var d2 = dir.Sqr();
 					var r = 150;
-					if(d2 < r*50){
+					if(d2 < r*r){
 						d2 = Math.sqrt(d2);
 						p.velocity.incrementBy(dir.Div(d2).Mul(kGravity.Mag()*2*dt));
 					}
