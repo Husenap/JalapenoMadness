@@ -12,13 +12,13 @@ define([
 		WIDTH	: wi,
 		HEIGHT	: he,
 
-		kGravity: new Vector2(0, 982),
-		kInteractionRadius: 40,
+		kGravity: new Vector2(0, 400),
+		kInteractionRadius: 60,
 		kLinearViscosity: 0.001,
 		kQuadraticViscosity: 0.01,
-		kRestDensity: 100,
-		kStiffness: 225,
-		kStiffnessNear: 12500,
+		kRestDensity: 200,
+		kStiffness: 25,
+		kStiffnessNear: 2000,
 	};
 
 	return Settings;

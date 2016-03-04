@@ -6,15 +6,17 @@ define([
 	"kernel",
 	"spatialHashGrid",
 	"line",
+	"color",
 	"settings"
-], function(Particle, Vector2, Kernel, SpatialHashGrid, Line, Settings){
+], function(Particle, Vector2, Kernel, SpatialHashGrid, Line, Color, Settings){
 	
-var Mouse = new Vector2();
+var Mouse = {pos: new Vector2(), prePos: new Vector2()};
 var Keyboard = {key:{}};
 
 	var SPHSystem = function(){
 		var kDT = 1/60;
 		var kGravity = Settings.kGravity;
+		var kGravityState = true;
 		var kInteractionRadius = Settings.kInteractionRadius;
 		var kLinearViscosity = Settings.kLinearViscosity;
 		var kQuadraticViscosity = Settings.kQuadraticViscosity;
@@ -39,10 +41,14 @@ var Keyboard = {key:{}};
 		stage.position = new Vector2(grid.halfWidth, grid.halfHeight);
 
 		_.times(2, function(i){
-			addLine(-grid.halfWidth, grid.halfHeight, grid.halfWidth, grid.halfHeight, linesCollision);
-			addLine(grid.halfWidth, grid.halfHeight, grid.halfWidth, -grid.halfHeight, linesCollision);
-			addLine(grid.halfWidth, -grid.halfHeight, -grid.halfWidth, -grid.halfHeight, linesCollision);
-			addLine(-grid.halfWidth, -grid.halfHeight, -grid.halfWidth, grid.halfHeight, linesCollision);
+			addLine(new Vector2(-grid.halfWidth, grid.halfHeight),
+					new Vector2(grid.halfWidth, grid.halfHeight), linesCollision);
+			addLine(new Vector2(grid.halfWidth, grid.halfHeight),
+					new Vector2(grid.halfWidth, -grid.halfHeight), linesCollision);
+			addLine(new Vector2(grid.halfWidth, -grid.halfHeight),
+					new Vector2(-grid.halfWidth, -grid.halfHeight), linesCollision);
+			addLine(new Vector2(-grid.halfWidth, -grid.halfHeight),
+					new Vector2(-grid.halfWidth, grid.halfHeight), linesCollision);
 		});
 
 		var corners = [
@@ -52,7 +58,7 @@ var Keyboard = {key:{}};
 			new Vector2(-300, -300)
 		]
 		var corners = [];
-		var poly = 0;
+		var poly = 4;
 		_.times(poly, function(i){
 			corners.push(new Vector2(
 				300*Math.cos((Math.PI*2)/poly*-i),
@@ -61,15 +67,10 @@ var Keyboard = {key:{}};
 		});
 		_.times(2, function(){
 			_.times(corners.length, function(i){
-				var line = addLine(0, 0, 0, 0, linesCollision);
-				line.start = corners[i];
-				line.end = corners[(i+1)%corners.length];
+				var line = addLine(corners[i], corners[(i+1)%corners.length], linesCollision);
 			});
 		});
 		
-		var gravityState = true;
-		var dAngle = 0.005;
-
 		function updateParameterList(){
 			var parameterList = $("#parameterList");
 			$(parameterList).find("#restDensity .val").text(kRestDensity);
@@ -86,6 +87,8 @@ var Keyboard = {key:{}};
 		function clamp(n, min, max){
 			return Math.max(min, Math.min(max, n));
 		}
+
+		var dAngle = 0.005;
 
 		this.update = function(timeStep){
 			if(Keyboard.key["KeyY"]) kRestDensity = clamp(kRestDensity+10, 0, 10000);
@@ -111,20 +114,19 @@ var Keyboard = {key:{}};
 				updateParameterList();
 			}
 			if(Keyboard.key["KeyG"]){
-				gravityState = !gravityState;
+				kGravityState = !kGravityState;
 				Keyboard.key["KeyG"] = false;
 				updateParameterList();
 			}
 
 			if(Keyboard.key["KeyA"]){
 				_.times(2, function(){
-
 					particles.push(new Particle({
-						newPos: Mouse.Clone(),
+						newPos: Mouse.pos.Clone(),
 						radius: kInteractionRadius,
-						restDensity: kRestDensity
+						restDensity: kRestDensity,
+						color: new Color(0, 0.3, 0.9)
 					}));
-
 				});
 			}
 			if(Keyboard.key["KeyC"]){
@@ -136,7 +138,7 @@ var Keyboard = {key:{}};
 
 			_.each(corners, function(corner, n){
 				var angle = Math.atan2(corner.y, corner.x);
-				corner.SetAngle(angle -= dAngle);
+				corner.SetAngle(angle + dAngle);
 			});
 
 			drawLine();
@@ -159,26 +161,35 @@ var Keyboard = {key:{}};
 		//Simulation Functions
 		function applyExternalForces(dt){
 			_.each(particles, function(p){
-				if(gravityState){
+				if(kGravityState){
 					p.velocity.incrementBy(kGravity.Mul(dt));
 				}
 
 				if(Mouse.right){
-					var dir = Mouse.Sub(p.position);
+					var dir = Mouse.pos.Sub(p.position);
 					if(dir.Equal(new Vector2()))return;
 					var d2 = dir.Sqr();
-					var r = 150;
+					var r = 100;
 					if(d2 < r*r){
 						d2 = Math.sqrt(d2);
 						p.velocity.incrementBy(dir.Div(d2).Mul(kGravity.Mag()*2*dt));
+						if(!Mouse.pos.Equal(Mouse.prePos)){
+							var diff = Mouse.pos.Sub(Mouse.prePos);
+							var tot = diff.Mul(kGravity.Mag() * 0.5 * dt);
+							p.velocity.incrementBy(tot);
+						}
 					}
 				}
 			});
 		}
+		var timer = performance.now();
+		var mixColors = true;
 		function applyViscosity(dt){
-			var loops = 0;
+			if(performance.now() - timer > 2000){
+				mixColors = true;
+				timer = performance.now();
+			}
 			_.each(particles, function(p){
-
 				_.each(p.neighbours, function(n){
 					if(p != n){
 						var v = n.position.Sub(p.position);
@@ -194,11 +205,18 @@ var Keyboard = {key:{}};
 							p.velocity.incrementBy(impulse.Mul(-1));
 							n.velocity.incrementBy(impulse);
 						}
-						loops++;
+						if(mixColors){
+							var mixWeight = 0.5;
+							var r = p.color.r * mixWeight + n.color.r * (1-mixWeight);
+							var g = p.color.g * mixWeight + n.color.g * (1-mixWeight);
+							var b = p.color.b * mixWeight + n.color.b * (1-mixWeight);
+							p.color.setTo(r, g, b);
+							n.color.setTo(r, g, b);
+						}
 					}
-					loops++;
 				});
 			});
+			if(mixColors)mixColors=false;
 		}
 		function advanceParticles(dt){
 			_.each(particles, function(p){
@@ -256,15 +274,12 @@ var Keyboard = {key:{}};
 
 					var proj = vLine.Mul(f);
 					var d2 = proj.Sub(particleVector).Sqr();
+
 					if(d2 > kCollisionRadius * kCollisionRadius)return;
 
 					var lineN = vLine.PerpendicularLeft().Normal();
-					if(p.velocity.Dot(vLine.PerpendicularLeft()) < 0){
-						var vReflect = lineN.Mul(lineN.Dot(p.velocity) * -1.8);
-						p.position.incrementBy(vReflect.Mul(dt));
-					}else{
-						p.position.incrementBy(lineN.Mul((kCollisionRadius-Math.sqrt(d2))*dt));
-					}
+
+					p.position.incrementBy(lineN.Mul(Math.pow(kCollisionRadius - Math.sqrt(d2), 2) * dt));
 				});
 			});
 		}
@@ -283,14 +298,14 @@ var Keyboard = {key:{}};
 		var isDrawingLine = false;
 		function drawLine(){
 			if(Mouse.left){
-				if(isDrawingLine){
-					linesCollision.last().end.Set(Mouse.Clone());
+				if(isDrawingLine && linesCollision.length){
+					linesCollision.last().end.Set(Mouse.pos.Clone());
 				}else{
-					addLine(Mouse.x, Mouse.y, Mouse.x, Mouse.y, linesCollision);
+					addLine(Mouse.pos.Clone(), Mouse.pos.Clone(), linesCollision);
 					isDrawingLine = true;
 				}
 			}else{
-				if(isDrawingLine){
+				if(isDrawingLine && linesCollision.length){
 					if(linesCollision.last().isDot()){
 						linesCollision.pop();
 					}
@@ -302,8 +317,8 @@ var Keyboard = {key:{}};
 
 		//Helper Functions
 
-		function addLine(sx, sy, ex, ey, list){
-			var temp = new Line(new Vector2(sx, sy), new Vector2(ex, ey));
+		function addLine(s, e, list){
+			var temp = new Line(s, e);
 			list.push(temp);
 			return temp;
 		}
@@ -312,10 +327,9 @@ var Keyboard = {key:{}};
 		//Keyboard and Mouse Listeners
 
 		$("canvas").bind('mousemove', function(e){
-			Mouse.px = Mouse.x;
-			Mouse.py = Mouse.y;
-			Mouse.x = e.offsetX/Settings.SCALE.x - stage.position.x;
-			Mouse.y = e.offsetY/Settings.SCALE.y - stage.position.y;
+			Mouse.prePos = Mouse.pos.Clone();
+			Mouse.pos.x = e.offsetX/Settings.SCALE.x - stage.position.x;
+			Mouse.pos.y = e.offsetY/Settings.SCALE.y - stage.position.y;
 		});
 		$("canvas").mousedown(function(e){
 			switch(e.which){
@@ -342,8 +356,48 @@ var Keyboard = {key:{}};
 			}
 		});
 		$(document).keydown(function(e){
-			console.log(e.originalEvent.code);
 			Keyboard.key[e.originalEvent.code] = true;
+
+			if(Keyboard.key["Digit7"]){
+				_.times(2, function(){
+					particles.push(new Particle({
+						newPos: Mouse.pos.Clone(),
+						radius: kInteractionRadius,
+						restDensity: kRestDensity,
+						color: new Color(1, 0.2, 0.2)
+					}));
+				});
+			}
+			if(Keyboard.key["Digit8"]){
+				_.times(2, function(){
+					particles.push(new Particle({
+						newPos: Mouse.pos.Clone(),
+						radius: kInteractionRadius,
+						restDensity: kRestDensity,
+						color: new Color(0.2, 1, 0.2)
+					}));
+				});
+			}
+			if(Keyboard.key["Digit9"]){
+				_.times(2, function(){
+					particles.push(new Particle({
+						newPos: Mouse.pos.Clone(),
+						radius: kInteractionRadius,
+						restDensity: kRestDensity,
+						color: new Color(0.2, 0.2, 1)
+					}));
+				});
+			}
+			if(Keyboard.key["Digit0"]){
+				_.times(2, function(){
+					particles.push(new Particle({
+						newPos: Mouse.pos.Clone(),
+						radius: kInteractionRadius,
+						restDensity: kRestDensity,
+						color: new Color(0.6, 0.2, 1)
+					}));
+				});
+			}
 		});
 		$(document).keyup(function(e){
 			Keyboard.key[e.originalEvent.code] = false;

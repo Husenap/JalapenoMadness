@@ -42,7 +42,7 @@ define([
 	$(parameterList).append("<span id='gravity'><p>gravity(arrows): <span class='val'>");
 	$(parameterList).append("<span id='numPtcls'><p>particles(C/A): <span class='val'>");
 	$(parameterList).append("<span id='numLines'><p>lines(D/LMB): <span class='val'>");
-	$(parameterList).append("<span id='info'>RMB for attractive force");
+	$(parameterList).append("<span id='info'>RMB for attractive force<br>7,8,9,0 for different coloured particles<br>G to toggle gravity");
 	$(stats.domElement).append(parameterList);
 
 
@@ -84,6 +84,9 @@ define([
 	// PRELOAD ASSETS
 	var loader = PIXI.loader;
 	loader.add('ball','img/ball.png');
+	loader.add('tris_01','img/tris_01.png');
+	loader.add('tris_02','img/tris_02.png');
+	loader.add('tris_03','img/tris_03.png');
 	loader.on('complete', onAssetsLoaded);
 	loader.load();
 	function onAssetsLoaded(){
