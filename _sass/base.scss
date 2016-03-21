@@ -52,11 +52,15 @@ h1, h2, h3, h4, h5, h6 {
 	font-weight: $font-weight;
 }
 
+//SMOOTH TRANSITION
+%smooth-transition {
+	transition: 150ms ease-in-out;
+}
 //LINKS
 a {
 	color: $color-l;
 	text-decoration: none;
-	transition: 150ms ease-in-out;
+	@extend %smooth-transition;
 
 	&:hover {
 		color: $color;
@@ -131,15 +135,29 @@ strong {
 	}
 }
 
-//ICONS
-.icon {
-	> svg {
+//SOCIAL MEDIA LIST
+.social-media-list {
+	li {
 		display: inline-block;
-		width: 5rem;
-		vertical-align: middle;
-		path {
-			fill: $color-l;
+		margin-right: 1rem;
+	}
+	a {
+		.icon {
+			> svg {
+				display: inline-block;
+				width: 4rem;
+				height: 4rem;
+				vertical-align: middle;
+				path {
+					@extend %smooth-transition;
+					fill: $color-l;
+				}
+			}
+		}
+		&:hover {
+			.icon > svg path{
+				fill: $color;
+			}
 		}
 	}
 }
-

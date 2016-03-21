@@ -5,10 +5,13 @@ permalink: /about/
 order: 3
 ---
 
-Hello!
-===
-My name is <span class="bold">Hussein Taher</span> and I'm <span id="myAge" class="bold"></span> years old.
+{:.page-heading}
+# Hello!
+---
 
+My name is **Hussein Taher** and I'm **<span id="myAge"></span>** years old.
+
+I love <button onclick="alert('I LOVE PROGRAMMING!');$('button').replaceWith('programming');">programming</button> and I'm always excited to learn new things!
 
 <script type="text/javascript">
 	function _calculateAge(birthday) { // birthday is a date
