@@ -1,0 +1,15 @@
+---
+layout: default
+---
+
+<h1 class="page-heading">{{ page.title }}
+	{% if page.tags contains "post" %}
+	<span class="post-meta">
+		&ndash; {{ page.date | date: "%b %-d, %Y" }}
+	</span>
+	{% endif %}
+</h1>
+{% if page.thumb %}<img src="{{ page.thumb | prepend: site.baseurl }}">{% endif %}
+<hr>
+
+{{ content }}

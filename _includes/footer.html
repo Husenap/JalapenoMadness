@@ -1,0 +1,19 @@
+<footer class="site-footer">
+	<div class="wrapper">
+		<div class="footer-col-wrapper">
+			<div class="footer-col footer-col-1">
+				<h2 class="footer-heading">{{ site.title }}</h2>
+				<ul class="social-media-list">
+					{% if site.github_username %}
+						<li>
+							{% include icon-github.html username=site.github_username %}
+						</li>
+					{% endif %}
+				</ul>
+			</div>
+			<div class="footer-col footer-col-2">
+				<p>Copyright &copy; 2016 Hussein Taher</p>
+			</div>
+		</div>
+	</div>
+</footer>

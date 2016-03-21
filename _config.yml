@@ -1,0 +1,12 @@
+# Site settings
+title: Hussein Taher | Programmer
+description: > # A little description
+ My name is Hussein Taher, I'm a programmer who is interested in making
+ games, websites, networking, databases, you name it.
+ game development programming algorithm project javascript js c++ blog
+baseurl: ""
+url: "http://husenap.github.io/"
+github_username: Husenap
+
+# Build settings
+markdown: kramdown
