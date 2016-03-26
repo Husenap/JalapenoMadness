@@ -150,6 +150,9 @@ strong {
 		width: 360px;
 		padding: 0 5px;
 	}
+	@include media-query(320px) {
+		width: 100%;
+	}
 }
 
 //CLEARFIX
