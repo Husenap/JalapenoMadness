@@ -1,18 +1,30 @@
 <head>
+	<!-- METAS -->
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
 	<meta name="description" content="{{ site.description }}">
-	
+
+	<!-- TITLES -->
 	<title>{% if page.title %}{{ page.title | escape }}{% else %}{{ site.title | escape }}{% endif %}</title>
+
+	<!-- LINKS -->
+	<link rel="canonical" href="{{ site.url }}{{ page.url }}" />
+
+	<!-- FAVICON START -->
+{% include favicon.html %}
+	<!-- FAVICON STOP -->
+
+	<!-- STYLESHEETS AND FONTS-->
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link href='https://fonts.googleapis.com/css?family=Roboto:100,300,400,400italic,500,700,900' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="{{ "/css/style.css" | prepend: site.baseurl }}">
-	<meta name="theme-color" content="#333"/>
-	<meta name="msapplication-navbutton-color" content="#333">
-	<meta name="apple-mobile-web-app-status-bar-style" content="#333">
 
-	<link rel="icon" href="{{ "/static/img/favicon.png" | prepend: site.baseurl }}">
-
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>		
-
+	<!-- ADDRESSBAR COLOUR -->
+	<meta name="theme-color" content="{{ site.addressbar }}"/>
+	<meta name="msapplication-navbutton-color" content="{{ site.addressbar }}">
+	<meta name="apple-mobile-web-app-status-bar-style" content="{{ site.addressbar }}">
+	
+	<!-- SCRIPTS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>		
 </head>

@@ -2,14 +2,70 @@
 layout: default
 ---
 
-<h1 class="page-heading">{{ page.title }}
-	{% if page.tags contains "post" %}
+<h1 class="page-heading">
+	{{ page.title }}
 	<span class="post-meta">
-		&ndash; {{ page.date | date: "%b %-d, %Y" }}
+		{{ page.date | date: "%b %-d, %Y" }}
 	</span>
-	{% endif %}
+	<ul class="topic-list">
+		{% for topic in page.topics %}
+			<li class="topic">{{ topic }}</li>
+		{% endfor %}
+		<a id="comment-count" href="#">0 Comments</a>
+	</ul>
 </h1>
 {% if page.thumb %}<img src="{{ page.thumb | prepend: site.baseurl }}">{% endif %}
 <hr>
 
-{{ content }}
+<div class="post-content">
+	<div id="table-of-contents-wrapper">
+		<h2>
+			Table of contents
+		</h2>
+		<ul class="table-of-contents"></ul>
+		<hr>
+	</div>
+	
+	{{ content }}
+
+	<div id="disqus_thread"></div>
+
+	<!--
+		GENERATE TABLE OF CONTENTS
+	-->
+	<script type="text/javascript">
+		var nodes = [".post-content > h2", 3, 4, 5, 6];
+		$(nodes.join(", .post-content > h")).each(function(i, header){
+			var link = $('<a>');
+			$(link).attr("href", location.origin + location.pathname + "#" + header.id);
+			$(link).text(header.textContent);
+			var li = $('<li>').append(link);
+			$(li).css("margin-left", (parseInt(header.localName.match(/[1-6]/))-2)*2 + "rem");
+			$(".table-of-contents").append(li);
+		});
+	</script>
+
+	<!--
+		ALL THE DISQUS COMMENT SECTION LOGIC
+	<script type="text/javascript">
+		var disqus_config = function () {
+			this.page.url = $("link[rel='canonical']").attr("href");
+			console.log(this.page.url);
+		};
+		(function() { // DON'T EDIT BELOW THIS LINE
+			var d = document, s = d.createElement('script');
+
+			s.src = '//husenap.disqus.com/embed.js';
+
+			s.setAttribute('data-timestamp', +new Date());
+			(d.head || d.body).appendChild(s);
+		})();
+	</script>
+
+	<script>
+		$("#comment-count").attr("href", $("link[rel='canonical']").attr("href") + "#disqus_thread");
+	</script>
+	<script id="dsq-count-scr" src="//husenap.disqus.com/count.js" async></script>
+	-->
+</div>
+

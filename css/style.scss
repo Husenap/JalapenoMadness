@@ -1,37 +1,108 @@
 ---
 ---
 @charset "utf-8";
-html {
-	font-size: 10px;
-}
-$font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-$font-size: 1.5rem;
-$font-weight: 400;
-$small-font-size: $font-size * 0.875;
-$line-height: 1.5;
+$font-family: 'Roboto', sans-serif;
+$space: 20px;
 
-$space: 1.5rem;
 
-$dark: #333;
-$light: #edc;
-$bg: #262324;
-
-$color-d: #9C3C3E;
-$color: lighten($color-d, 20%);
-$color-l: lighten($color, 20%);
-
-$content-width: 960px;
-$on-palm: 600px;
-$on-laptop: 800px;
-
+//RESPONSIVENESS
+$on-laptop: 1240px;
+$on-palm: 760px;
 @mixin media-query($device){
 	@media screen and (max-width: $device){
 		@content;
 	}
 }
 
+//MIXINS
+@mixin set-z($off){
+	z-index: #{$off};
+	@if $off == 1 {
+		box-shadow: 0 1px 4px rgba(black, 0.37), //TOP
+					0 0 #{$off + 2}px 2px rgba(black, 0.16); //AMBIENT
+	} @else {
+		box-shadow: 0 #{$off*7-8}px #{$off*15-20}px rgba(black, 0.3), //TOP
+					0 #{$off*3+2}px #{$off*5-3}px rgba(black, (-0.017*$off+0.22)), //BOTTOM
+					0 0 #{$off + 2}px 2px rgba(black, 0.16); //AMBIENT
+	}
+}
+
+//MATERIAL DESIGN COLOUR AND TEXT
+$theme1: {{ site.theme1 }};
+$theme2: {{ site.theme2 }};
+$theme3: {{ site.theme3 }};
+$theme4: {{ site.theme4 }};
+$color500: {{ site.color500 }};
+$color700: {{ site.color700 }};
+$color800: {{ site.color800 }};
+$accent200: {{ site.accent200 }};
+$accent400: {{ site.accent400 }};
+$shade: {{ site.shade }};
+
+$text: white;
+$primary-text: 1;
+$secondary-text: 0.7;
+$hint-text: 0.5;
+$divider: 0.12;
+
+%primary-text-color {color: rgba($text, $primary-text);}
+%secondary-text-color {color: rgba($text, $secondary-text);}
+%hint-text-color {color: rgba($text, $hint-text);}
+%divider-text-color {color: rgba($text, $divider);}
+
+@mixin set-font($size, $weight){
+	font-size: $size;
+	font-weight: $weight;
+}
+
+.font-display3, %font-display3 {@include set-font(5.6rem, 700); @extend %secondary-text-color;}
+.font-display2, %font-display2 {@include set-font(4.5rem, 700); @extend %secondary-text-color;}
+.font-display1, %font-display1 {@include set-font(3.4rem, 700); @extend %secondary-text-color;}
+.font-headline, %font-headline {@include set-font(2.4rem, 500); @extend %primary-text-color;}
+.font-title, %font-title {@include set-font(2rem, 500); @extend %primary-text-color;}
+.font-subheading, %font-subheading {
+	color: rgba($accent200, $primary-text);
+	@include set-font(1.5rem, 400);
+	@include media-query($on-palm){
+		@include set-font(1.6rem, 400);
+	}
+}
+.font-body, %font-body {
+	@include set-font(1.3rem, 300);
+	@extend %primary-text-color;
+	@include media-query($on-palm){
+		@include set-font(1.4rem, 300);
+	}
+}
+.font-body2, %font-body2 {
+	@include set-font(1.3rem, 500);
+	@extend %primary-text-color;
+	@include media-query($on-palm){
+		@include set-font(1.4rem, 500);
+	}
+}
+.font-caption, %font-caption {@include set-font(1.6rem, 400); @extend %secondary-text-color;}
+.font-button, %font-button {
+	@include set-font(1.4rem, 900);
+	color: rgba(black, 0.87);
+	text-transform: uppercase;
+}
+
+
+html {
+	font-size: 10px;
+	letter-spacing: 0.1px;
+	@include media-query($on-laptop) {
+		font-size: 9px;
+	}
+	@include media-query($on-palm) {
+		font-size: 8px;
+	}
+}
+
 @import
 	"base",
 	"_layout",
+	"_extras",
 	"_syntax-highlight"
 ;

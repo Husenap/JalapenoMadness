@@ -1,0 +1,26 @@
+<div class="{{ include._class }}">
+	<div class="wrapper">
+		<a class="site-title" href="{{ site.baseurl }}/">
+			{{ site.title }}
+		</a>
+		{% if page.title %}
+			<span class="chapter-title-small">
+				<span class="dash">&ndash; </span>{{ page.title | escape }}
+			</span>
+		{% endif %}
+		<nav class="site-nav">
+			<i class="material-icons menu-icon">menu</i>
+		
+			{% assign pages = site.pages | sort:"order" %}
+			<div class="trigger">
+				{% for my_page in pages %}
+					{% if my_page.title %}
+						<li class="page-link-wrapper">
+							<a class="page-link rippleParent" href="{{ my_page.url | prepend: site.baseurl }}">{{ my_page.title }}</a>
+						</li>
+					{% endif %}
+				{% endfor %}
+			</div>
+		</nav>
+	</div>
+</div>

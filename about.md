@@ -11,7 +11,7 @@ order: 3
 
 My name is **Hussein Taher** and I'm **<span id="myAge"></span>** years old.
 
-I love <button onclick="alert('I LOVE PROGRAMMING!');$('button').replaceWith('programming');">programming</button> and I'm always excited to learn new things!
+I love <button class="button lift-3 rippleParent" onclick="setTimeout(function(){alert('I LOVE PROGRAMMING!');$('button').replaceWith('programming');},1000);">programming</button> and I'm always excited to learn new things!
 
 <script type="text/javascript">
 	function _calculateAge(birthday) { // birthday is a date

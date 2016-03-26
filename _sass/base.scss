@@ -1,5 +1,5 @@
 //RESET BASIC ELEMENTS
-body, h1, h2, h3, h4, h5, h6,
+html, body, h1, h2, h3, h4, h5, h6,
 p, blockquote, pre,
 dl, dd, ol, ul, figure {
 	margin: 0;
@@ -7,10 +7,13 @@ dl, dd, ol, ul, figure {
 }
 
 //BASIC STYLING
+* {
+	box-sizing: border-box;
+}
 body {
-	font: $font-weight #{$font-size}/#{$line-height} $font-family;
-	color: $color-l;
-	background: $bg;
+	font-family: $font-family;
+	@extend %font-body;
+	background: $theme3;
 }
 
 //VERTICAL RHYTHM
@@ -25,13 +28,13 @@ ul, ol, dl, figure,
 hr,
 %horiline {
 	border: none;
-	background: linear-gradient(to right, rgba($color-l, 0) 0%, $color-l 10%, $color-l 90%, rgba($color-l, 0) 100%);
+	background: rgba($text, $divider);
 	height: 1px;
 }
 
 //IMAGES
 img {
-	max-width: 100%;
+	width: 100%;
 	vertical-align: middle;
 }
 
@@ -48,81 +51,104 @@ li {
 }
 
 //HEADINGS
-h1, h2, h3, h4, h5, h6 {
-	font-weight: $font-weight;
-}
+h1 {@extend %font-headline;}
+h2 {@extend %font-title;}
+h3, h4, h5, h6 {@extend %font-subheading;}
 
 //SMOOTH TRANSITION
-%smooth-transition {
-	transition: 150ms ease-in-out;
+@mixin smooth-transition($time){
+	-webkit-transition: $time ease-in-out;
+	-moz-transition: $time ease-in-out;
+	-o-transition: $time ease-in-out;
+	transition: $time ease-in-out;
 }
+$bounce-out: cubic-bezier(0.7,-0.1,0.3,1.3);
+@mixin bounce-transition($time){
+	-webkit-transition: $time $bounce-out;
+	-moz-transition: $time $bounce-out;
+	-o-transition: $time $bounce-out;
+	transition: $time $bounce-out;
+}
+
 //LINKS
 a {
-	color: $color-l;
+	@extend %font-body2;
+	color: rgba($accent200, $primary-text);
 	text-decoration: none;
-	@extend %smooth-transition;
-
-	&:hover {
-		color: $color;
-	}
 }
 
 //BLOCKQUOTES
 blockquote {
-	color: $color;
-	border-left: 0.3rem solid $color-l;
-	padding-left: $space;
-	font-size: 1.8rem;
+	background: $theme4;
+	color: $accent200;
+	@include set-font(1.8rem, 200);
 	letter-spacing: 1px;
-	font-style: italic;
+	border-left: 3px solid $accent400;
+	padding: 1rem 0;
+	padding-left: $space;
+	margin: 1rem 0;
 
 	small {
-		font-size: 1.3rem;
+		@include set-font(1.3rem, 200);
 		margin-left: 2rem;
 	}
 }
 
 //CODE FORMATTING
-
 figure.highlight {
 	pre {
 		font-size: 1.5rem;
 	}
 	> pre {
-		border: 1px solid $color-d;
-		background: $dark;
+		border: 1px solid $accent400;
+		background: $theme4;
 		padding: 0.8rem 1.2rem;
 		overflow-x: auto;
 	}
 	.lineno{
-		color: $light;
-		margin-right: 0.5rem;
+		color: rgba($accent200, $secondary-text);
+		margin-right: 1rem;
+		padding-right: 0.5rem;
+		border-right: 1px solid rgba($text, $divider);
 	}
 }
 code.highlighter-rouge {
-	background: $dark;
-	border: 1px solid $color-d;
-	padding: 1px;
+	background: $theme4;
+	border: 1px solid $accent400;
+	padding: 0.2rem;
 }
 
 //BOLD TEXT
 strong {
-	font-weight: bold;
-	color: $color;
+	@extend %font-body2;
+}
+
+//BUTTONS
+.button,
+%button {
+	@extend %font-button;
+	background: $accent200;
+	border: none;
+	border-top: 1px solid rgba(white, 0.2);
+	border-bottom: 1px solid rgba($shade, 0.2);
+	border-radius: 2px;
+	padding: 5px 20px;
+	@include set-z(1);
+	cursor: pointer;
 }
 
 //WRAPPER
 .wrapper {
-	max-width: -webkit-calc(#{$content-width} - (#{$space} * 2));
-	max-width: calc(#{$content-width} - (#{$space} * 2));
+	width: 1160px;
 	margin: 0 auto;
-	padding: 0 $space;
 	@extend %clearfix;
 
 	@include media-query($on-laptop) {
-		max-width: -webkit-calc(#{$content-width} - #{$space});
-		max-width: calc(#{$content-width} - #{$space});
-		padding: 0 $space/2;
+		width: 740px;
+	}
+	@include media-query($on-palm) {
+		width: 360px;
+		padding: 0 5px;
 	}
 }
 
@@ -132,32 +158,5 @@ strong {
 		content: "";
 		display: table;
 		clear: both;
-	}
-}
-
-//SOCIAL MEDIA LIST
-.social-media-list {
-	li {
-		display: inline-block;
-		margin-right: 1rem;
-	}
-	a {
-		.icon {
-			> svg {
-				display: inline-block;
-				width: 4rem;
-				height: 4rem;
-				vertical-align: middle;
-				path {
-					@extend %smooth-transition;
-					fill: $color-l;
-				}
-			}
-		}
-		&:hover {
-			.icon > svg path{
-				fill: $color;
-			}
-		}
 	}
 }

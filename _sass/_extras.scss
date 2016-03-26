@@ -1,0 +1,45 @@
+.lift-3,
+%lift-3 {
+	@include smooth-transition(150ms);
+	&:hover {
+		@include set-z(3);
+	}
+}
+
+
+
+// RIPPLE EFFECT
+.rippleParent {
+	display: inline-block;
+	position: relative;
+	overflow: hidden;
+	padding: 1rem;
+}
+.ripple {
+	display: block;
+	position: absolute;
+	background: rgba($text, $hint-text);
+	border-radius: 100%;
+	-webkit-transform: scale(0);
+	-moz-transform: scale(0);
+	-o-transform: scale(0);
+	transform: scale(0);
+}
+.animateRipple {
+	-webkit-animation: rippleAnimation 650ms $bounce-out;
+	-moz-animation: rippleAnimation 650ms $bounce-out;
+	-o-animation: rippleAnimation 650ms $bounce-out;
+	animation: rippleAnimation 650ms $bounce-out;
+}
+@-webkit-keyframes  rippleAnimation {
+	to { opacity:0; -webkit-transform: scale(2.5); }
+}
+@-moz-keyframes rippleAnimation {
+	to { opacity:0; -moz-transform: scale(2.5); }
+}
+@-o-keyframes rippleAnimation {
+	to { opacity:0; -o-transform: scale(2.5); }
+}
+@keyframes rippleAnimation {
+	to { opacity:0; transform: scale(2.5); }
+}
