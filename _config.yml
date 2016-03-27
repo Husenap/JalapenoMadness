@@ -8,6 +8,8 @@ baseurl: ""
 url: "http://husenap.github.io"
 github_username: Husenap
 
+disqus_shortname: husenap
+
 theme1: "#000"
 theme2: "#212121"
 theme3: "#303030"

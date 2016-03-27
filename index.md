@@ -8,4 +8,4 @@ layout: default
 
 Here you will find all kinds of things related to **programming** and **me**!
 
-I will be posting about everything from **personal projects** to **game jams** to pretty much **anything**... not sure about what just yet.
+I will be posting about everything from **personal projects** to **game jams** to pretty much **anything**... not sure about what, just yet...

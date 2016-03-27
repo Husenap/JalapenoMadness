@@ -6,4 +6,4 @@ type: "project"
 order: 1
 ---
 
-Here you will find projects that I've finish or that I'm done with.
+Here you will find projects that I've finished or that I'm done working with.
