@@ -78,7 +78,7 @@
 			background: rgba(0, 0, 0, 0.25);
 			width: 0; height: 100%;
 			top: 0; right: 0;
-			@include bounce-transition(500ms);
+			@include bounce-transition(300ms);
 		}
 	}
 
