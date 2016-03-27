@@ -13,6 +13,7 @@ dl, dd, ol, ul, figure {
 body {
 	font-family: $font-family;
 	@extend %font-body;
+	word-break: break-word;
 	background: $theme3;
 }
 
@@ -113,6 +114,7 @@ figure.highlight {
 	}
 }
 code.highlighter-rouge {
+	display: inline-block;
 	background: $theme4;
 	border: 1px solid $accent400;
 	padding: 0.2rem;

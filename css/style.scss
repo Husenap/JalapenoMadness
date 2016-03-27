@@ -39,11 +39,11 @@ $accent200: {{ site.accent200 }};
 $accent400: {{ site.accent400 }};
 $shade: {{ site.shade }};
 
-$text: white;
-$primary-text: 1;
-$secondary-text: 0.7;
-$hint-text: 0.5;
-$divider: 0.12;
+$text: {{ site.text }};
+$primary-text: {{ site.primary-text }};
+$secondary-text: {{ site.secondary-text }};
+$hint-text: {{ site.hint-text }};
+$divider: {{ site.divider }};
 
 %primary-text-color {color: rgba($text, $primary-text);}
 %secondary-text-color {color: rgba($text, $secondary-text);}
