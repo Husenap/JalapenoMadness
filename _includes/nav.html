@@ -13,6 +13,7 @@
 		
 			{% assign pages = site.pages | sort:"order" %}
 			<div class="trigger">
+				<div class="menu-overlay"></div>
 				{% for my_page in pages %}
 					{% if my_page.title %}
 						<li class="page-link-wrapper">

@@ -73,6 +73,13 @@
 	
 	.trigger {
 		display: inline-flex;
+		.menu-overlay {
+			position: fixed;
+			background: rgba(0, 0, 0, 0.25);
+			width: 0; height: 100%;
+			top: 0; right: 0;
+			@include bounce-transition(500ms);
+		}
 	}
 
 	@include media-query($on-laptop) {
@@ -102,6 +109,9 @@
 		.trigger-active {
 			display: block;
 			right: 0%;
+			.menu-overlay {
+				width: 100%;
+			}
 		}
 		.page-link-wrapper {
 			display: block;

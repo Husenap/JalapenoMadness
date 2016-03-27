@@ -18,6 +18,9 @@ $(document).scroll(function(e){
 $(".menu-icon").click(function(e){
 	$(".trigger").toggleClass("trigger-active");
 });
+$(".menu-overlay").click(function(e){
+	$(".trigger").removeClass("trigger-active");
+});
 
 $(".rippleParent").mousedown(function(e){
 	handleRipple(this, e, "animateRipple");
