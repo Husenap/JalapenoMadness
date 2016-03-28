@@ -61,7 +61,7 @@ $divider: {{ site.divider }};
 .font-headline, %font-headline {@include set-font(2.4rem, 500); @extend %primary-text-color;}
 .font-title, %font-title {@include set-font(2rem, 500); @extend %primary-text-color;}
 .font-subheading, %font-subheading {
-	color: rgba($accent200, $primary-text);
+	color: rgba($color500, $primary-text);
 	@include set-font(1.5rem, 400);
 	@include media-query($on-palm){
 		@include set-font(1.6rem, 400);
