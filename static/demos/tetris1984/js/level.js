@@ -119,6 +119,7 @@ define([
 			_.forEach(col, function(tile){
 				tile.html("&middot;");
 				tile.css('color', '#968699');
+				tile.css('opacity', 1);
 			});
 		});
 		_.forEach(preview, function(col){

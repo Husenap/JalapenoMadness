@@ -134,7 +134,7 @@ define([
 			this.updateBlocks();
 		}
 		_.forEach(this.blocks, function(b){
-			b.draw(0.5);
+			b.draw(0.25);
 		});
 	}
 	Piece.prototype.moveX = function(dx){
@@ -203,7 +203,7 @@ define([
 			this.addBlock({x: 0, y: 0});this.addBlock({x: 0, y: -1});this.addBlock({x: 1, y: -1});this.addBlock({x: 1, y: 0});
 			break;
 		case "T":
-			this.color="#9c27b0";
+			this.color="#b3e";
 			this.addBlock({x: 0, y: 0});this.addBlock({x: 0, y: -1});this.addBlock({x: 1, y: 0});this.addBlock({x: -1, y: 0});
 			break;
 		case "S":
@@ -215,7 +215,7 @@ define([
 			this.addBlock({x: 0, y: 0});this.addBlock({x: 1, y: 0});this.addBlock({x: 0, y: -1});this.addBlock({x: -1, y: -1});
 			break;
 		case "J":
-			this.color="#03f";
+			this.color="#33f";
 			this.addBlock({x: 0, y: 0});this.addBlock({x: 1, y: 0});this.addBlock({x: -1, y: 0});this.addBlock({x: -1, y: -1});
 			break;
 		case "L":
