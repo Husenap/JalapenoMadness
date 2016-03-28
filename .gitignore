@@ -6,3 +6,5 @@ _site
 themes/
 
 static/extra/DISQUS_URL_MAPPER.csv
+
+static/img/_favicon

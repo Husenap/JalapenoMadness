@@ -11,7 +11,7 @@ layout: default
 		{% for topic in page.topics %}
 			<li class="topic">{{ topic }}</li>
 		{% endfor %}
-		<a id="comment-count" href="#">0 Comments</a>
+		<a id="comment-count" href="#" data-disqus-identifier="{{ page.title }}/{{ page.date }}">0 Comments</a>
 	</ul>
 </h1>
 {% if page.thumb %}<img src="{{ page.thumb | prepend: site.baseurl }}">{% endif %}
@@ -51,7 +51,7 @@ layout: default
 	<script type="text/javascript">
 		var disqus_config = function () {
 			this.page.url = $("link[rel='canonical']").attr("href");
-			console.log(this.page.url);
+			this.page.identifier = "{{ page.title }}/{{ page.date }}";
 		};
 		(function() { // DON'T EDIT BELOW THIS LINE
 			var d = document, s = d.createElement('script');
