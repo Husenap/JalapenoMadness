@@ -10,7 +10,11 @@
 		{% for post in site.posts limit:10 %}{% unless post.tag == "unfinished" %}
 			<item>
 				<title>{{ post.title | xml_escape }} [{{ post.tag | xml_escape }}]</title>
-				<description>{{ post.description | xml_escape }}{{ post.content | xml_escape }}</description>
+				<description>
+					<img src="{{ post.thumb | prepend:site.url }}">
+					{{ post.description | xml_escape }}
+					{{ post.content | xml_escape }}
+				</description>
 				<pubDate>{{ post.date | date: "%a, %d %b %Y %H:%M:%S %z" }}</pubDate>
 				<link>{{ site.url }}{{ post.url }}</link>
 				<guid isPermaLink="true">{{ site.url }}{{ post.url }}</guid>
