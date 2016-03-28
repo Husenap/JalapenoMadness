@@ -11,16 +11,17 @@
 			<item>
 				<title>{{ post.title | xml_escape }} [{{ post.tag | xml_escape }}]</title>
 				<description>
-					<img src="{{ post.thumb | prepend:site.url }}">
+					<img src="{{ post.thumb | prepend:site.url }}"/>
 					{{ post.description | xml_escape }}
 					{{ post.content | xml_escape }}
 				</description>
 				<pubDate>{{ post.date | date: "%a, %d %b %Y %H:%M:%S %z" }}</pubDate>
 				<link>{{ site.url }}{{ post.url }}</link>
 				<guid isPermaLink="true">{{ site.url }}{{ post.url }}</guid>
-				<media:keywords>{{ post.topics | join:", " }}</media:keywords>
-				<media:category>{{ post.tag }}</media:category>
-				<media:thumbnail url="{{ post.thumb | prepend:site.url }}"/>
+
+				<keywords>{{ post.topics | join:", " }}</keywords>
+				<category>{{ post.tag }}</category>
+				<thumbnail url="{{ post.thumb | prepend:site.url }}"/>
 			</item>
 		{% endunless %}{% endfor %}
 	</channel>
