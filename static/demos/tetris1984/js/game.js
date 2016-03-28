@@ -38,6 +38,7 @@ define([
 			_.forEach(col, function(tile){
 				tile.html("&middot;");
 				tile.attr('solid', '');
+				tile.css('color', '#968699');
 			});
 		});
 		level = new Level(tiles, preview);

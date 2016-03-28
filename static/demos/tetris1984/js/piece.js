@@ -116,19 +116,26 @@ define([
 		this.collision();
 	}
 	Piece.prototype.hardDrop = function(){
-		var self = this;
 		var bonus = 0;
 		while(true){
-			var flag = false;
-			_.forEach(this.blocks, function(b){
-				self.collision();
-			});
-			if(self.locked)break;
-			self.pos.y++;
-			self.updateBlocks();
+			this.collision();
+			if(this.locked)break;
+			this.pos.y++;
+			this.updateBlocks();
 			bonus+=1;
 		}
 		$('#score').html(parseInt($('#score').html())+bonus);
+	}
+	Piece.prototype.predictGhost = function(){
+		while(true){
+			this.collision();
+			if(this.locked)break;
+			this.pos.y++;
+			this.updateBlocks();
+		}
+		_.forEach(this.blocks, function(b){
+			b.draw(0.5);
+		});
 	}
 	Piece.prototype.moveX = function(dx){
 		var flag = false;
@@ -182,32 +189,41 @@ define([
 		var _pos = this.pos;
 		block.relpos = _relpos;
 		block.pos = {x:_relpos.x+_pos.x, y:_relpos.y+_pos.y};
+		block.color = this.color;
 		this.blocks.push(block);
 	}
 	Piece.prototype.createPiece = function(type){
 		switch(type){
 		case "I":
+			this.color="#0bf";
 			this.addBlock({x: 0, y: 0});this.addBlock({x: 1, y: 0});this.addBlock({x: 2, y: 0});this.addBlock({x: -1, y: 0});
 			break;
 		case "O":
+			this.color="#ff0";
 			this.addBlock({x: 0, y: 0});this.addBlock({x: 0, y: -1});this.addBlock({x: 1, y: -1});this.addBlock({x: 1, y: 0});
 			break;
 		case "T":
+			this.color="#9c27b0";
 			this.addBlock({x: 0, y: 0});this.addBlock({x: 0, y: -1});this.addBlock({x: 1, y: 0});this.addBlock({x: -1, y: 0});
 			break;
 		case "S":
+			this.color="#0f3";
 			this.addBlock({x: 0, y: 0});this.addBlock({x: -1, y: 0});this.addBlock({x: 0, y: -1});this.addBlock({x: 1, y: -1});
 			break;
 		case "Z":
+			this.color="#f33";
 			this.addBlock({x: 0, y: 0});this.addBlock({x: 1, y: 0});this.addBlock({x: 0, y: -1});this.addBlock({x: -1, y: -1});
 			break;
 		case "J":
+			this.color="#03f";
 			this.addBlock({x: 0, y: 0});this.addBlock({x: 1, y: 0});this.addBlock({x: -1, y: 0});this.addBlock({x: -1, y: -1});
 			break;
 		case "L":
+			this.color="#f90";
 			this.addBlock({x: 0, y: 0});this.addBlock({x: -1, y: 0});this.addBlock({x: 1, y: 0});this.addBlock({x: 1, y: -1});
 			break;
 		default:
+			this.color="#0bf";
 			this.addBlock({x: 0, y: 0});this.addBlock({x: 0, y: 1});this.addBlock({x: 0, y: 2});this.addBlock({x: 0, y: -1});
 			break;
 		}

@@ -24,6 +24,12 @@ define([
 			case "y":
 				if(i[1] == parseInt(i[1], 10))Settings.HEIGHT = y = i[1];
 			break;
+			case "color":
+				if(i[1] == "true")Settings.COLOR = true;
+			break;
+			case "ghost":
+				if(i[1] == "true")Settings.GHOST = true;
+			break;
 		}
 	});
 

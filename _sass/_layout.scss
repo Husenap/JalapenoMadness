@@ -239,11 +239,11 @@
 
 		&[class*="left-"] {
 			float: left;
-			padding-left: 0;
+			padding-left: 0 !important;
 		}
 		&[class*="right-"] {
 			float: right;
-			padding-right: 0;
+			padding-right: 0 !important;
 		}
 		&[class*="-half"] {
 			width: 50%;
@@ -258,9 +258,9 @@
 			padding: 0.5rem;
 		}
 		@include media-query($on-palm) {
-			padding: 0.2rem;
 			&[class*="-half"] {
 				width: 100%;
+				padding: 0.2rem 0;
 			}
 			&[class*="-quarter"] {
 				width: 50%;

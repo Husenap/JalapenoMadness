@@ -1,8 +1,8 @@
 'use strict';
 
 define([
-
-], function(){
+	"settings"
+], function(Settings){
 
 	var Block = function(t){
 		this.tiles = t;
@@ -16,15 +16,26 @@ define([
 	}
 	Block.prototype.exactUpdate = function(newPos){
 		this.pos = newPos;
+
 		if(this.tiles[this.pos.x]!=undefined &&
-			this.tiles[this.pos.x][this.pos.y]!=undefined){
+			this.tiles[this.pos.x][this.pos.y]!=undefined) {
+
 			this.curr = this.tiles[this.pos.x][this.pos.y];
 		}else{
 			this.curr = null;
 		}
 	}
-	Block.prototype.draw = function(){
-		if(this.curr)this.curr.html("[]");
+	Block.prototype.draw = function(alpha){
+		if(this.curr){
+			this.curr.html("[]");
+			if(Settings.COLOR){
+				this.curr.css("color", this.color);
+				if(alpha)
+					this.curr.css("opacity", alpha);
+				else
+					this.curr.css("opacity", 1);
+			}
+		}
 	}
 	Block.prototype.rotate = function(cw){
 		if(cw){

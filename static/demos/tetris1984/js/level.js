@@ -98,8 +98,13 @@ define([
 		if(curPiece.locked)this.newPiece();
 		curPiece.update();
 	}
+
 	Level.prototype.draw = function(){
 		curPiece.draw();
+		if(Settings.GHOST){
+			var ghost = $.extend(true,{},curPiece);
+			ghost.predictGhost();
+		}
 		
 		_.forEach(self.lines, function(line){
 			_.forEach(line, function(block){
@@ -113,6 +118,7 @@ define([
 		_.forEach(tiles, function(col){
 			_.forEach(col, function(tile){
 				tile.html("&middot;");
+				tile.css('color', '#968699');
 			});
 		});
 		_.forEach(preview, function(col){
