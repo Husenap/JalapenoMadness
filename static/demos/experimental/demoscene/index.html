@@ -51,8 +51,8 @@ onload = function update(){
 		frame++;
 		timeNextFrame += 1/60;
 
-		vines = vines.filter(v => v.l--);
-		vines.forEach(v => {
+		vines = vines.filter(function(v){return v.l--});
+		vines.forEach(function(v){
 			dx = Math.cos(v.a) * v.w / 4
 			dy = Math.sin(v.a) * v.w / 4
 			v.x += dx;
@@ -82,7 +82,7 @@ onload = function update(){
 		W = b.width = 0 | H * innerWidth / innerHeight;
 		c.translate(W/2, H/2);
 		c.shadowBlur=8;
-		vines.forEach(v => {
+		vines.forEach(function(v){
 			c.shadowColor =
 			c.strokeStyle = "hsl("+(v.a*60|0)+", 100%, "+
 							(50+v.w*5)+"%)";
