@@ -4,6 +4,21 @@ MAX=48;
 function key(n){
 	return 0|(Math.pow(Math.pow(2, 1/12), n-69) * 440);
 }
+function createFreqList(keys){
+	var notesFreq = [];
+	var len = keys.length;
+	var l = len;
+	for(;l--;)notesFreq.push(key(keys[len-1-l]));
+	return {
+		list: notesFreq,
+		at: function(i){
+			return this.list[i%this.list.length];
+		}
+	};
+}
+function LFO(time, f, a){
+	
+}
 
 onload = function update(){
 	requestAnimationFrame(update);
@@ -15,16 +30,10 @@ onload = function update(){
 		vines = [{x:0,y:0,a:0,ai:0,w:8,p:[],l:MAX*60}];
 
 		noteIndex = -1;
-		// notesFreq = [523, 784, 880, 784, 699, 659, 587, 523]; // blinka lilla
 		// notesFreq = [155, 194, 261, 230, 194, 261, 195, 155];
-		noteKeys = [60, 60, 67, 67, 69, 69, 67, undefined, 65, 65, 64, 64, 62, 62, 60, undefined, 67, 67, 65, 65, 64, 64, 62, undefined, 67, 67, 65, 65, 64, 64, 62, undefined, 60, 60, 67, 67, 69, 69, 67, undefined, 65, 65, 64, 64, 62, 62, 60, undefined];
-		notesFreq = [];
-		keys = noteKeys.length;
-		l = keys;
-		for(;l--;)notesFreq.push(key(noteKeys[keys-1-l]));
 		notesFreq1 = [261, 261, 195, 195, 230, 230, 155, 155];
-		len = notesFreq.length;
-		len1 = notesFreq1.length;
+		melody = createFreqList([60, 60, 67, 67, 69, 69, 67, undefined, 65, 65, 64, 64, 62, 62, 60, undefined, 67, 67, 65, 65, 64, 64, 62, undefined, 67, 67, 65, 65, 64, 64, 62, undefined, 60, 60, 67, 67, 69, 69, 67, undefined, 65, 65, 64, 64, 62, 62, 60, undefined]);
+		chords = createFreqList([48, 48, 48, 48, 53, 53, 48, undefined, 53, 53, 48, 48, 55, 55, 48, undefined, 48, 48, 53, 53, 48, 48, 55, undefined, 48, 48, 53, 53, 48, 48, 55, undefined]);
 		str = "";
 		s = !a.src;
 	}
@@ -33,14 +42,13 @@ onload = function update(){
 	while(time < currentTime){
 		while(time < timeNextFrame){
 			if(s){
-				frac = (time*2) % 1;
+				frac = (time) % 1;
 				noteIndex += frac==0;
 
-				v = (time * notesFreq[noteIndex%len] * (0|Math.cos(frac*4)*2)%1) * (1-frac) * 0;
-				v += (time * notesFreq1[noteIndex%len1]&1) * (1-frac) * 0;
-				v += (time * notesFreq1[noteIndex%len1]&1) * (0.75-frac) * 0;
-				v += (time * (0|Math.cos(notesFreq1[noteIndex&len1]<<4))&1) * (1-frac) * 0;
-				v += (time * notesFreq[noteIndex%len]%1) * (1-frac) * 32;
+				v = (time * melody.at(noteIndex) * (0|Math.cos(frac*4)*2)%1) * (1-frac) * 32;
+				v += (time * chords.at(noteIndex)&1) * (1-frac) * 16;
+				//v += (time * (0|Math.cos(notesFreq[noteIndex&len]))&1) * (1-frac) * 0;
+				v += (time * melody.at(noteIndex)%1) * (1-frac) * 16;
 
 				str += String.fromCharCode(v + 127);
 			}
