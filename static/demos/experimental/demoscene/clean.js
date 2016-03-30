@@ -1,7 +1,7 @@
 //http://www.edmproducer.com/wp-content/uploads/2014/06/frequencychart.png
 
-c=b.getContext("2d");
-MAX=64;
+var c = b.getContext("2d");
+var MAX = 64;
 
 function key(n){
 	return 0|(Math.pow(Math.pow(2, 1/12), n-69) * 440);
@@ -10,9 +10,9 @@ function createFreqList(keys, _bs){
 	var noteFreqs = new Array(_bs);
 	var len = keys.length;
 	for(var i = 0; i < len; i++){
-		var places = keys[i][0];
+		var places = keys[i][1];
 		for(var j = 0; j < places.length; j++){
-			noteFreqs[places[j]-1] = key(keys[i][1]);
+			noteFreqs[places[j]-1] = key(keys[i][0]);
 		}
 	}
 	for(var i = 0; i < noteFreqs.length; i++){
@@ -48,18 +48,18 @@ onload = function update(){
 		bpm = 512;
 		beats = 128;
 		melody = createFreqList([
-				[[4,5], 88],
-				[[34,35,66,67,82,83], 86],
-				[[84,85], 84],
-				[[10,11,26,27,42,43,74,75,86,87], 83],
-				[[18,19,22,23,32,33,50,51,54,55,64,65,90,91], 81],
-				[[20,21,30,31,52,53,62,63], 79],
-				[[58,59], 78],
+				[88, [4,5]],
+				[86, [34,35,66,67,82,83]],
+				[84, [84,85]],
+				[83, [10,11,26,27,42,43,74,75,86,87]],
+				[81, [18,19,22,23,32,33,50,51,54,55,64,65,90,91]],
+				[79, [20,21,30,31,52,53,62,63]],
+				[78, [58,59]],
 		],beats);
 		chords = createFreqList([
-				[[8, 16, 24, 32], 76], 
-				[[40, 48, 56, 64], 74],
-				[[72, 80, 88, 96], 78],
+				[76, [8, 16, 24, 32]], 
+				[74, [40, 48, 56, 64]],
+				[78, [72, 80, 88, 96]],
 		],beats);
 		str = "";
 		s = !a.src;
@@ -72,10 +72,17 @@ onload = function update(){
 				frac = (time*(bpm/64|0)) % 1;
 				noteIndex += frac==0;
 
-				v = (time * chords.at(noteIndex) * (0|Math.cos(frac*4)*2)%1) * (1-frac) * 0;
-				v += (time * chords.at(noteIndex)&1) * (1) * 32;
-				//v += (time * (0|Math.cos(notesFreq[noteIndex&len]))&1) * (1-frac) * 0;
-				v += (time * melody.at(noteIndex)%1) * (1) * 32;
+				q = (1-frac);
+
+				v = (time * melody.at(noteIndex) * (0|Math.cos(frac*8)*4)%1) * q*q * 32;
+
+				v += (time * chords.at(noteIndex)&1) * frac * 32;
+				v += (time * chords.at(noteIndex-1)&1) * q * 32;
+
+				v += (time * chords.at(noteIndex+4)/8%1) * (1-Math.pow(frac, 10)) * 32;
+				v += (time * (Math.random())%1) * q*q*q*0.25 * ((noteIndex+1)%4==0?(32*(currentTime/currentTime)):0);
+				v += ((time*time * (Math.random() / (.01+frac)))%1) * (1-frac*frac) * ((noteIndex+1)%8==0?32:0);
+				//v += (time * 0|Math.sin(time*10)%1) * 32;
 
 				str += String.fromCharCode(v + 127);
 			}
@@ -111,7 +118,7 @@ onload = function update(){
 		a.play();
 		time = 0;
 	}else{
-		H = b.height = 1024;
+		H = b.height = 512;
 		W = b.width = 0 | H * innerWidth / innerHeight;
 		c.translate(W/2, H/2);
 		c.shadowBlur=8;
