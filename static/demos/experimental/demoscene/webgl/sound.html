@@ -19,6 +19,8 @@
 <audio src="res/Fallen.mp3" id="a"></audio>
 <script>
 
+window.AudioContext = window.AudioContext||window.webkitAudioContext;
+
 var ac = new AudioContext();
 var ana = ac.createAnalyser();
 var src = ac.createMediaElementSource(a);
