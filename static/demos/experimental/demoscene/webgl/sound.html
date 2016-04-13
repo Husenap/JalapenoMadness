@@ -1,0 +1,510 @@
+<style>
+#b{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+#f{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 1024px;
+	height: 256px;
+}
+</style>
+<canvas id="b"></canvas>
+<canvas id="f"></canvas>
+<audio src="res/Fallen.mp3" id="a"></audio>
+<script>
+
+var ac = new AudioContext();
+var ana = ac.createAnalyser();
+var src = ac.createMediaElementSource(a);
+src.connect(ana);
+ana.connect(ac.destination)
+
+var freqs = new Uint8Array(ana.frequencyBinCount);
+var fseg = [0.1, 0.2, 0.3, 0.5, 0.6, 0.75];
+var freqParts = [];
+
+onload = function(){
+	gl = b.getContext("experimental-webgl");
+	ctx = f.getContext("2d");
+	f.width = 1024;
+	f.height = 256;
+
+	onresize = resize;
+	resize();
+	function resize(){
+		var qual = 1.0;
+		W = b.width = innerWidth/qual;
+		H = b.height = innerHeight/qual;
+		gl.viewport(0, 0, W, H);
+		
+		initFramebuffer();
+	}
+
+	initDemo();
+}
+
+
+function initDemo(){
+	shader = new ShaderProgram("marching");
+	fxShader = new ShaderProgram("distortion");
+
+	var points = [-1, -1, -1, 1, 1, -1, 1, 1];
+	quad = new VertexBuffer(2, gl.FLOAT, new Float32Array(points));
+
+	a.play();
+	requestAnimationFrame(update);
+}
+function initFramebuffer(){
+	renderTarget = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, renderTarget);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, W, H, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+	fbo = gl.createFramebuffer();
+	gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, renderTarget, 0);
+}
+function update(){
+	requestAnimationFrame(update);
+	updateDemo();
+}
+function updateDemo(){
+	updateAudio();
+
+	gl.viewport(0, 0, W, H);
+
+
+	//NORMAL SHADER
+	gl.bindTexture(gl.TEXTURE_2D, null);
+	gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+
+	shader.bind();
+	shader.setFloatUniform("time", performance.now()/1000);
+	shader.setVec2Uniform("res", [W, H]);
+
+	shader.setFloatUniform("fft_low", freqParts[0]);
+	shader.setFloatUniform("fft_mid", freqParts[1]);
+	shader.setFloatUniform("fft_high", freqParts[2]);
+
+	quad.bind(shader.getAttribLoc("p"));
+
+	gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+	//FX SHADER
+	gl.bindTexture(gl.TEXTURE_2D, renderTarget);
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+	fxShader.bind();
+	fxShader.setFloatUniform("time", performance.now()/1000);
+	fxShader.setVec2Uniform("res", [W, H]);
+	fxShader.setSamplerUniform("img", 0);
+	
+	fxShader.setFloatUniform("fft_low", freqParts[0]);
+	fxShader.setFloatUniform("fft_mid", freqParts[1]);
+	fxShader.setFloatUniform("fft_high", freqParts[2]);
+
+	gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+	//DEBUG FFT
+	/*
+	ctx.save();
+	ctx.clearRect(0, 0, f.width, f.height);
+
+	cols = ["red", "green", "blue"];
+	for(var i = 0; i < 3; i++){
+		ctx.fillStyle = cols[i];
+		ctx.fillRect(f.width - (3-i) * 50, f.height, 50, -freqParts[i]*256);
+	}
+
+	var fs = freqs.length;
+	for(var i = 1; i < fs; i++){
+		ctx.beginPath();
+		ctx.moveTo((i-1)*(1024/fs), f.height - freqs[i-1]);
+		ctx.lineTo(i*(1024/fs), f.height - freqs[i]-20);
+		if(i > fseg[0]*fs && i < fseg[1]*fs){ ctx.strokeStyle = "red";
+		}else if(i > fseg[2]*fs && i < fseg[3]*fs){
+			ctx.strokeStyle = "green";
+		}else if(i > fseg[4]*fs && i < fseg[5]*fs){
+			ctx.strokeStyle = "blue";
+		}else{
+			ctx.strokeStyle = "white";
+		}
+		ctx.stroke();
+	}
+	ctx.restore();
+	*/
+}
+function updateAudio(){
+	ana.getByteFrequencyData(freqs);
+
+	var fs = freqs.length;
+	
+	freqParts = [0, 0, 0];
+	for(var i = Math.floor(fseg[0]*fs); i < fseg[1]*fs; i++)freqParts[0] += freqs[i];
+	for(var i = Math.floor(fseg[2]*fs); i < fseg[3]*fs; i++)freqParts[1] += freqs[i];
+	for(var i = Math.floor(fseg[4]*fs); i < fseg[5]*fs; i++)freqParts[2] += freqs[i];
+	freqParts[0] /= 255.0*(fseg[1]*fs-fseg[0]*fs);
+	freqParts[1] /= 255.0*(fseg[3]*fs-fseg[2]*fs);
+	freqParts[2] /= 255.0*(fseg[5]*fs-fseg[4]*fs);
+}
+
+
+function VertexBuffer(siz, typ, dat){
+	this.vbo = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+	gl.bufferData(gl.ARRAY_BUFFER, dat, gl.STATIC_DRAW);
+
+	this.bind = function(AI){
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+		gl.enableVertexAttribArray(AI);
+		gl.vertexAttribPointer(AI, siz, typ, false, 0, 0);
+	}
+}
+function ShaderProgram(id){
+	function compile(type, id){
+		var shader = gl.createShader(type);
+
+		var code = "";
+		if(type == gl.VERTEX_SHADER){
+			code = document.getElementById(id+"-vs").textContent;
+		}else if(type == gl.FRAGMENT_SHADER){
+			code = document.getElementById(id+"-fs").textContent;
+		}else{
+			return null;
+		}
+
+		gl.shaderSource(shader, code);
+		gl.compileShader(shader);
+
+		if(!gl.getShaderParameter(shader, gl.COMPILE_STATUS)){
+			alert(gl.getShaderInfoLog(shader));
+			return null;
+		}
+		return shader;
+	}
+
+	var vertexShader = compile(gl.VERTEX_SHADER, id);
+	var fragmentShader = compile(gl.FRAGMENT_SHADER, id);
+
+	this.program = gl.createProgram();
+	gl.attachShader(this.program, vertexShader);
+	gl.attachShader(this.program, fragmentShader);
+	gl.linkProgram(this.program);
+
+	if(!gl.getProgramParameter(this.program, gl.LINK_STATUS))alert("SHADER LINK FAILED");
+
+	this.bind = function(){gl.useProgram(this.program);}
+	this.getAttribLoc = function(name){
+		return gl.getAttribLocation(this.program, name);
+	}
+	this.setFloatUniform = function(name, value){
+		var loc = gl.getUniformLocation(this.program, name);
+		gl.uniform1f(loc, value);
+	}
+	this.setVec2Uniform = function(name, value){
+		var loc = gl.getUniformLocation(this.program, name);
+		gl.uniform2f(loc, value[0], value[1]);
+	}
+	this.setSamplerUniform = function(name, value){
+		var location = gl.getUniformLocation(this.program, name);
+		gl.uniform1i(location, value);
+	}
+}
+
+</script>
+
+<!--
+//=========================================================
+//================== RAY MARCHING SHADER ==================
+//=========================================================
+-->
+<script id="marching-vs" type="x-shader/x-vertex">
+precision mediump float;
+
+attribute vec2 p;
+
+void main(){
+	gl_Position = vec4(p, 0, 1);
+}
+</script>
+<script id="marching-fs" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform float time;
+uniform vec2 res;
+
+uniform float fft_low;
+uniform float fft_mid;
+uniform float fft_high;
+
+const vec3 g_forward = vec3(0.0, 0.0, -1.0);
+const vec3 g_right = vec3(1.0, 0.0, 0.0);
+const vec3 g_up = vec3(0.0, 1.0, 0.0);
+
+float g_focalLength = 1.97; // Distance between the eye and the image plane
+const float g_zNear = 0.0; // Near clip depth
+const float g_zFar = 25.0; // Far clip depth
+
+const int g_steps = 64; // Max raymarch steps
+const float g_epsilon = 0.001; // Surface threshold
+
+vec3 g_lightPos = vec3(0.0);
+vec4 g_lightCol = vec4(1.0, 0.2, 0.0, 1.0);
+
+//const vec4 g_skyColor = vec4(0.31, 0.47, 0.67, 1.0);
+vec4 g_skyColor = vec4(0, 0, 0, 1.0);
+const vec4 g_ambient = vec4(0.15, 0.2, 0.32, 1.0);
+
+
+//HELPER FUNCTION
+float mapTo(float x, float minX, float maxX, float minY, float maxY){
+	float a = (maxY - minY) / (maxX - minX);
+	float b = minY - a * minX;
+	return a * x + b;
+}
+
+float udBox(vec3 p, vec3 s){
+	return length(max(abs(p) - s, vec3(0.0)));
+}
+float sdBox(vec3 p, vec3 s){
+	vec3 d = abs(p) - s;
+	return min(max(d.x, max(d.y, d.z)), 0.0) + udBox(p, s);
+}
+float sdSphere(vec3 p, float radius){
+	return length(p) - radius;
+}
+float opSubtract(float da, float db){
+	return max(da, -db);
+}
+float opIntersect(float da, float db){
+	return max(da, db);
+}
+float opUnion(float da, float db){
+	return min(da, db);
+}
+vec3 opTwist(vec3 p){
+	float c = cos(0.25*p.y);
+	float s = sin(0.25*p.y);
+	mat2 m = mat2(c, -s, s, c);
+	return vec3(m*p.xz, p.y);
+}
+
+float distScene(vec3 p){
+	// SPHERES AND PLANE
+	/*
+	return min(
+		length(mod(p, vec3(2.)) - vec3(1.0)) - 0.25, //SPHERES
+		dot(p, vec3(0, 1, 0)) //PLANE
+	);
+	*/
+
+	// SPHERE FRACTAL
+	/*
+	float d = sdSphere(p, 2.0);
+	p.xyz = mod(p.xyz, 0.5) - vec3(0.25);
+	return opSubtract(d, sdBox(p, vec3(0.2)));
+	*/
+
+	// COOL EXTRUSION
+	// Electron and an atom? カワイ！
+	float d0 = sdSphere(p, 1.5);
+	float dist = 2.0 + fft_mid*2.0;
+	float d1 = sdSphere(p - vec3(-sin(time)*dist, cos(time)*dist, 0), 0.5);
+	//return opUnion(d0, d1);
+
+	vec3 q = p;
+	q = mod(opTwist(p), 0.6) - vec3(0.3);
+	float extrusionField0 = sdBox(q, vec3(0.1));
+
+	float df = opUnion(d0, d1);
+	float df0 = opIntersect(df, extrusionField0);
+	return opUnion(df0, df+1.5-fft_low*2.5);
+}
+
+vec3 getNormal(vec3 p){
+	float h = 0.0001;
+
+	return normalize(vec3(
+				distScene(p + vec3(h, 0, 0)) - distScene(p - vec3(h, 0, 0)),
+				distScene(p + vec3(0, h, 0)) - distScene(p - vec3(0, h, 0)),
+				distScene(p + vec3(0, 0, h)) - distScene(p - vec3(0, 0, h))));
+}
+
+float getShadow(vec3 p0, vec3 p1, float k){
+	vec3 dir = normalize(p1-p0);
+	float t = 10.0*g_epsilon;
+	float maxT = length(p1-p0);
+	float f = 1.0; //penumbra
+	for(int i = 0; i < g_steps; ++i){
+		float d = distScene(p0 + dir * t);
+
+		if(d < g_epsilon)
+			return 0.0;
+
+		f = min(f, k*d/t);
+
+		t += d;
+		
+		if(t >= maxT)
+			break;
+	}
+	return f;
+}
+
+float ambientOcclusion(vec3 p, vec3 n){
+	float stepSize = 0.01;
+	float t = stepSize;
+	float oc = 0.0;
+	for(int i = 0; i < g_steps/4; ++i){
+		float d = distScene(p + n * t);
+		oc += t - d;
+		t += stepSize;
+	}
+	return clamp(oc, 0.0, 1.0);
+}
+
+vec4 getShading(vec3 p, vec3 n, vec3 lp, vec4 lc){
+	float lI = 0.0; //lightIntensity
+	float shadow = getShadow(p, lp, 16.0); 
+	if(shadow > 0.0){
+		vec3 ld = normalize(lp-p); // lightDirection
+		lI = shadow * clamp(dot(n, ld), 0.0, 1.0);
+	}
+	return lc * lI + g_ambient * (1.0 - lI);
+}
+
+void raymarch(vec3 pos, vec3 dir, out int i, out float t){
+	t = 0.0;
+	for(int j = 0; j < g_steps; ++j){
+		vec3 p = pos + dir * t;
+		float d = distScene(p);
+		if(d < g_epsilon || t > g_zFar){
+			i = j;
+			break;
+		}
+		t += d;
+	}
+}
+
+vec4 computeColor(vec3 pos, vec3 dir){
+	float t0;
+	int i;
+	raymarch(pos, dir, i, t0);
+
+	vec3 p;
+	vec3 n;
+	float t;
+	vec4 texture = vec4(1.0);
+
+	if(i < g_steps && t0 > g_zNear && t0 < g_zFar){
+		t = t0;
+		p = pos + dir * t0;
+		n = getNormal(p);
+	}else{
+		return g_skyColor;
+	}
+
+	vec4 color;
+	float z = mapTo(t, g_zNear, g_zFar, 1.0, 0.0);
+
+	color = texture * (
+			getShading(p, n, g_lightPos, g_lightCol)
+			);
+
+	float ao = ambientOcclusion(p, n);
+	color *= 1.0 - ao;
+
+	float z2 = z*z;
+	color = mix(g_skyColor, color, z2 * (3.0 - 2.0 * z));
+
+	return color;
+}
+
+mat3 rotationMatrix(vec3 axis, float angle){
+	axis = normalize(axis);
+	float s = -sin(angle);
+	float c = cos(angle);
+	float oc = 1. - c;
+
+	return mat3(oc * axis.x * axis.x + c,			oc * axis.x * axis.y - axis.z * s,	oc * axis.z * axis.x + axis.y * s,
+				oc * axis.x * axis.y + axis.z * s,	oc * axis.y * axis.y + c,			oc * axis.y * axis.z - axis.x * s,
+				oc * axis.z * axis.x - axis.y * s,	oc * axis.y * axis.z + axis.x * s,	oc * axis.z * axis.z + c		);
+}
+
+vec3 calcDirection(){
+	float AR = res.x / res.y;
+	float u = gl_FragCoord.x * 2.0 / res.x - 1.0;
+	float v = gl_FragCoord.y * 2.0 / res.y - 1.0;
+	vec3 res = normalize(g_forward * g_focalLength + g_right * u * AR + g_up * v);
+	return res;
+}
+
+void update(){
+	g_lightPos = vec3(sin(time)*10.0, cos(time)*10.0, sin(time*4.0)*10.0);
+	g_lightCol = vec4(1.0-fft_high, 1.0-fft_mid, 1.0-fft_low, 1.0);
+	g_skyColor = clamp(vec4(0.31+fft_high, 0.47+fft_mid, 0.67-fft_low, 1.0), 0.0, 1.0);
+}
+
+void main(){
+	update();
+
+	float radius = 7.0 + fft_low*2.0;
+	vec3 pos = vec3(-sin(time)*radius, cos(0.5*time)*3.0, cos(time)*radius);
+	vec3 dir = calcDirection();
+	dir *= rotationMatrix(vec3(1, 0, 0), cos(0.5*time)*0.4);
+	dir *= rotationMatrix(vec3(0, 1, 0), time);
+
+	vec4 color = computeColor(pos, dir);
+	
+	gl_FragColor = vec4(color.xyz, 1.0);
+}
+</script>
+
+<!--
+//===============================================
+//================== FX SHADER ==================
+//===============================================
+-->
+
+<script id="distortion-vs" type="x-shader/x-vertex">
+precision mediump float;
+
+attribute vec2 p;
+
+void main(){
+	gl_Position = vec4(p, 0, 1);
+}
+</script>
+<script id="distortion-fs" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform float time;
+uniform vec2 res;
+uniform sampler2D img;
+
+uniform float fft_low;
+uniform float fft_mid;
+uniform float fft_high;
+
+void main(){
+	vec2 uv = gl_FragCoord.xy / res;
+	float delta = fft_high/25.;
+	vec4 color = texture2D(img, uv + vec2(delta, 0.0));
+	color += texture2D(img, uv + vec2(-delta, 0.0));
+	color += texture2D(img, uv + vec2(0.0, delta));
+	color += texture2D(img, uv + vec2(0.0, -delta));
+	color /= 4.0;
+	
+	color.rgb *= vec3(1.0 - pow(distance(uv, vec2(0.5, 0.5)), 2.1) * 2.8);
+
+	gl_FragColor = vec4(color.rgb, 1.0);
+}
+</script>

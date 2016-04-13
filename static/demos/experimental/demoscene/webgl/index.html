@@ -1,0 +1,149 @@
+<style>
+#b{
+	position: fixed;
+	top: 0;
+	left: 0;
+}
+</style>
+<canvas id="b"></canvas>
+<script>
+function initGL(){
+	gl = b.getContext("experimental-webgl");
+
+	onresize = resize;
+	resize();
+}
+function resize(){
+	W = b.width = innerWidth;
+	H = b.height = innerHeight;
+
+	gl.viewport(0, 0, W, H);
+}
+function update(){
+	updateDemo();
+	requestAnimationFrame(update);
+}
+function main(){
+	initGL();
+	initDemo();
+	requestAnimationFrame(update);
+}
+onload = main;
+
+
+function initDemo(){
+	myShader = new ShaderProgram("test");
+
+	var points = [-1, -1, -1, 1, 1, 1, 1, -1];
+	quad = new VertexBuffer(2, gl.FLOAT, new Float32Array(points));
+}
+function updateDemo(){
+	gl.viewport(0, 0, W, H);
+
+	myShader.bind();
+	myShader.setFloatUniform("time", performance.now()/1000);
+	myShader.setVec2Uniform("res", [W, H]);
+
+	var posAttribute = myShader.getAttributeLocation("p");
+	quad.bind(posAttribute);
+
+	gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+}
+
+
+function VertexBuffer(is, it, data){
+	this.is = is;
+	this.ic = data.length / is;
+	this.it = it;
+
+	this.vbo = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+	gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+
+	this.bind = function(ai){
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+		gl.enableVertexAttribArray(ai);
+		gl.vertexAttribPointer(ai, this.is, this.it, false, 0, 0);
+	}
+}
+function ShaderProgram(id){
+	var vertexShader = this.compile(gl.VERTEX_SHADER, id);
+	var fragmentShader = this.compile(gl.FRAGMENT_SHADER, id);
+
+	this.program = gl.createProgram();
+	gl.attachShader(this.program, vertexShader);
+	gl.attachShader(this.program, fragmentShader);
+	gl.linkProgram(this.program);
+	
+	if(!gl.getProgramParameter(this.program, gl.LINK_STATUS))alert("SHADER LINK FAILED");
+
+	this.bind = function(){
+		gl.useProgram(this.program);
+	}
+	this.getAttributeLocation = function(name){
+		return gl.getAttribLocation(this.program, name);
+	}
+	this.setFloatUniform = function(name, value){
+		var loc = gl.getUniformLocation(this.program, name);
+		gl.uniform1f(loc, value);
+	}
+	this.setVec2Uniform = function(name, value){
+		var loc = gl.getUniformLocation(this.program, name);
+		gl.uniform2f(loc, value[0], value[1]);
+	}
+}
+ShaderProgram.prototype.compile = function(type, id){
+	var shader = gl.createShader(type);
+	
+	var code = "";
+	if(type == gl.VERTEX_SHADER){
+		code = document.getElementById(id+"-vs").textContent;
+	}else if(type == gl.FRAGMENT_SHADER){
+		code = document.getElementById(id+"-fs").textContent;
+	}else{
+		return null;
+	}
+
+	gl.shaderSource(shader, code);
+	gl.compileShader(shader);
+
+	if(!gl.getShaderParameter(shader, gl.COMPILE_STATUS)){
+		alert(gl.getShaderInfoLog(shader));
+		return null;
+	}
+	return shader;
+}
+</script>
+<script id="test-vs" type="x-shader/x-vertex">
+precision highp float;
+
+uniform float time;
+uniform vec2 res;
+
+attribute vec2 p;
+
+varying vec2 pos;
+
+void main(){
+	pos = p;
+	gl_Position = vec4(p, 0, 1);
+}
+</script>
+<script id="test-fs" type="x-shader/x-fragment">
+precision highp float;
+
+uniform float time;
+uniform vec2 res;
+
+varying vec2 pos;
+
+float ratio = res.y/res.x;
+
+void main(){
+	gl_FragColor = mix(
+		vec4(1, cos(time)*0.5+.5, 0, 1),
+		vec4(0, 0, 0, 1),
+		step(1., distance(vec2(pos.x/normalize(res).y, pos.y/normalize(res).x), vec2(.0,.0)))
+	);
+}
+</script>

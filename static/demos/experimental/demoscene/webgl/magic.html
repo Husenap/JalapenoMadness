@@ -1,0 +1,228 @@
+<style>
+#b{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+</style>
+<canvas id="b"></canvas>
+<script>
+
+onload = function(){
+	gl = b.getContext("experimental-webgl");
+
+	onresize = resize;
+	resize();
+	function resize(){
+		var qual = 2;
+		W = b.width = innerWidth/qual;
+		H = b.height = innerHeight/qual;
+		gl.viewport(0, 0, W, H);
+	}
+
+	initDemo();
+}
+function initDemo(){
+	shader = new ShaderProgram("color");
+
+	var points = [-1, -1, -1, 1, 1, -1, 1, 1];
+	quad = new VertexBuffer(2, gl.FLOAT, new Float32Array(points));
+	requestAnimationFrame(update);
+}
+function update(){
+	requestAnimationFrame(update);
+	updateDemo();
+}
+function updateDemo(){
+	gl.viewport(0, 0, W, H);
+
+	shader.bind();
+	shader.setFloatUniform("time", performance.now()/1000);
+	shader.setVec2Uniform("res", [W, H]);
+
+	quad.bind(shader.getAttribLoc("p"));
+
+	gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+}
+
+
+function VertexBuffer(siz, typ, dat){
+	this.vbo = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+	gl.bufferData(gl.ARRAY_BUFFER, dat, gl.STATIC_DRAW);
+
+	this.bind = function(AI){
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+		gl.enableVertexAttribArray(AI);
+		gl.vertexAttribPointer(AI, siz, typ, false, 0, 0);
+	}
+}
+function ShaderProgram(id){
+	function compile(type, id){
+		var shader = gl.createShader(type);
+
+		var code = "";
+		if(type == gl.VERTEX_SHADER){
+			code = document.getElementById(id+"-vs").textContent;
+		}else if(type == gl.FRAGMENT_SHADER){
+			code = document.getElementById(id+"-fs").textContent;
+		}else{
+			return null;
+		}
+
+		gl.shaderSource(shader, code);
+		gl.compileShader(shader);
+
+		if(!gl.getShaderParameter(shader, gl.COMPILE_STATUS)){
+			alert(gl.getShaderInfoLog(shader));
+			return null;
+		}
+		return shader;
+	}
+
+	var vertexShader = compile(gl.VERTEX_SHADER, id);
+	var fragmentShader = compile(gl.FRAGMENT_SHADER, id);
+
+	this.program = gl.createProgram();
+	gl.attachShader(this.program, vertexShader);
+	gl.attachShader(this.program, fragmentShader);
+	gl.linkProgram(this.program);
+
+	if(!gl.getProgramParameter(this.program, gl.LINK_STATUS))alert("SHADER LINK FAILED");
+
+	this.bind = function(){gl.useProgram(this.program);}
+	this.getAttribLoc = function(name){
+		return gl.getAttribLocation(this.program, name);
+	}
+	this.setFloatUniform = function(name, value){
+		var loc = gl.getUniformLocation(this.program, name);
+		gl.uniform1f(loc, value);
+	}
+	this.setVec2Uniform = function(name, value){
+		var loc = gl.getUniformLocation(this.program, name);
+		gl.uniform2f(loc, value[0], value[1]);
+	}
+}
+
+</script>
+<script id="color-vs" type="x-shader/x-vertex">
+precision highp float;
+
+uniform float time;
+uniform vec2 res;
+
+attribute vec2 p;
+
+void main(){
+	gl_Position = vec4(p, 0, 1);
+}
+</script>
+<script id="color-fs" type="x-shader/x-fragment">
+precision highp float;
+
+uniform float time;
+uniform vec2 res;
+
+mat3 rotationMatrix(vec3 axis, float angle){
+	axis = normalize(axis);
+	float s = sin(angle);
+	float c = cos(angle);
+	float oc = 1. - c;
+
+	return mat3(oc * axis.x * axis.x + c,			oc * axis.x * axis.y - axis.z * s,	oc * axis.z * axis.x + axis.y * s,
+				oc * axis.x * axis.y + axis.z * s,	oc * axis.y * axis.y + c,			oc * axis.y * axis.z - axis.x * s,
+				oc * axis.z * axis.x - axis.y * s,	oc * axis.y * axis.z + axis.x * s,	oc * axis.z * axis.z + c		);
+}
+
+vec3 calcDirection(){
+	vec3 res = normalize(vec3(
+		(gl_FragCoord.x - res.x * 0.5) / res.y,
+		gl_FragCoord.y / res.y - .5,
+		1.
+	));
+	return res;
+}
+
+float iSphere(vec3 p, float r){
+	return length(p) - r;
+}
+float iBox(vec3 p, vec3 b){
+	return length(max(abs(p)-b, 0.0));
+}
+float iRoundBox(vec3 p, vec3 b, float r){
+	return length(max(abs(p)-b, 0.0)) - r;
+}
+float iTorus(vec3 p, vec2 t){
+	vec2 q = vec2(length(p.xz)-t.x, p.y);
+	return length(q)-t.y;
+}
+
+float iUnion(float a, float b){
+	return min(a, b);
+}
+float iSubtraction(float a, float b){
+	return max(a, -b);
+}
+float iIntersection(float a, float b){
+	return max(a, b);
+}
+
+vec3 iTwist(vec3 p){
+	float c = cos(0.3*p.y);
+	float s = sin(0.3*p.y);
+	mat2 m = mat2(c,-s,s,c);
+	return vec3(m*p.xz, p.y);
+}
+
+vec3 iRepetition(vec3 p, vec3 c){
+	return mod(p, c) - 0.5*c;
+}
+
+float map(vec3 pos){
+	float res = iRoundBox(iTwist(pos), vec3(2., 2., 5.), 0.25);
+	res = iSubtraction(res, iSphere(pos, 2.75));
+
+	res = iUnion(res, iTorus(iRepetition(pos, vec3(10., 0, 10.)), vec2(5., 0.5)));
+
+	return res;
+}
+
+vec3 traceRay(vec3 pos, vec3 dir){
+	for(int i = 0; i < 50; i++){
+		float distance = map(pos);
+		pos += distance * dir;
+	}
+	return pos;
+}
+
+vec3 calcNormal(vec3 pos){
+	float eps = 0.001;
+	return normalize(vec3(
+		map(vec3(pos.x + eps, pos.yz)) - map(vec3(pos.x - eps, pos.yz)),
+		map(vec3(pos.x, pos.y + eps, pos.z)) - map(vec3(pos.x, pos.y - eps, pos.z)),
+		map(vec3(pos.xy, pos.z + eps)) - map(vec3(pos.xy, pos.z - eps))
+	));
+}
+
+void main(){
+	float radius = 20.;
+	vec3 pos = vec3(sin(time) * -radius, radius/2., cos(time) * -radius);
+	vec3 dir = calcDirection();
+	dir *= rotationMatrix(vec3(1, 0, 0), 0.5);
+	dir *= rotationMatrix(vec3(0, 1, 0), time);
+	
+	vec3 point = traceRay(pos, dir);
+	vec3 normal = calcNormal(point);
+
+	vec3 color = vec3(1., 0.3, 0.5);
+
+	float diffuse = max(dot(normal, normalize(pos-point)), 0.1);
+
+	color *= diffuse;
+
+	gl_FragColor = vec4(color, 1.0);
+}
+</script>
+
