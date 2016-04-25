@@ -18,7 +18,7 @@ permalink: /posts/:year/:month/:day/:title/
 
 > The demoscene is an international computer art subculture that specializes in producing demos: small, self-contained computer programs that produce audio-visual presentations. The main goal of a demo is to show off programming, artistic, and musical skills.
 > 
-> <small><a href="https://en.wikipedia.org/wiki/Demoscene">Demoscene (wikipedia)</a></small>
+> <small>[Demoscene (wikipedia)](https://en.wikipedia.org/wiki/Demoscene)</small>
 
 
 ## Why make a demo?
@@ -47,20 +47,20 @@ The base of my demo was simply 2 spheres, a large one with a smaller one orbitin
 It reminded me of an atom with an electron in an orbit around it.
 
 I then created a domain with a single cube and repeated that domain infinitely.
-Thanks to <a href="http://www.iquilezles.org/">iq</a> and his amazing functions, I then created an extrusionfield based on that repeated domain.
+Thanks to [iq](http://www.iquilezles.org/) and his amazing functions, I then created an extrusionfield based on that repeated domain.
 Then I used the intersect operation to create a cool effect between the extrusionfield and the spheres.
 
 In the end I used the twist operation to rotate the cube domain a little bit for added effect.
 
 Since I'm using raymarching, ambient occlusion and shadow casting becomes really cheap, which is great, cause that means I can use it to make everything look even better! Again, thanks to iq and his formulas, this was easy to implement.
 
-All the distance functions and operations can be found <a href="http://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm">here</a>.
+All the distance functions and operations can be found [here](http://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm).
 
 ### Audio
 
 It was now time to add some animation to this whole thing!
 Since using sine wave animation based on time looks very static and boring, it was time to sync the animation to some music.
-The way I went about doing this was by fetching the <a href="https://en.wikipedia.org/wiki/Fast_Fourier_transform">FFT</a> from the audio track and picked out the frequencies that I wanted.
+The way I went about doing this was by fetching the [FFT](https://en.wikipedia.org/wiki/Fast_Fourier_transform) from the audio track and picked out the frequencies that I wanted.
 
 I picked out 3 different ranges from the FFT spectrum that I was going to send to the shader.
 
@@ -87,9 +87,8 @@ I wanted this to also be synced to the music, so I let the blur depend on the ff
 That was pretty much it for this demo, it was fun making and was mostly for learning.
 I didn't generate my own music though because that's a bit tricky, but I'll save that for the next time.
 
-For now, just enjoy the sweet track <a href="https://youtu.be/6nc8PJvkU2E">I've Fallen For You by Tom Redwood</a> while watching the demo below.
+For now, just enjoy the sweet track [I've Fallen For You by Tom Redwood](https://youtu.be/6nc8PJvkU2E) while watching the demo below.
 
 ## Links
 
-<a class="button lift-3 rippleParent" href="{{ "/static/demos/experimental/demoscene/webgl/sound.html" | prepend: site.baseurl }}">RUN THE DEMO!!</a>
-
+[Run The Demo!!]({{ "/static/demos/experimental/demoscene/webgl/sound.html" | prepend: site.baseurl }}){:.button .lift-3 .rippleParent}

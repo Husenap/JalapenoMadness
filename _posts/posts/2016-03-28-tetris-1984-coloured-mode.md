@@ -52,7 +52,7 @@ Piece.prototype.predictGhost = function(){
 
 ## Links
 
-<a class="button lift-3 rippleParent" href="{{ "/static/demos/tetris1984/?color=true&ghost=true" | prepend: site.baseurl }}">Play Tetris 1984 With Colour</a>
-<a class="button lift-3 rippleParent" href="https://github.com/Husenap/Husenap.github.io/tree/master/static/demos/tetris1984">Source Code</a>
-<a class="button lift-3 rippleParent" href="http://husenap.github.io/projects/2016/03/27/tetris-1984/">Read about the project</a>
+[Play Tetris 1984 With Colour]({{ "/static/demos/tetris1984/?color=true&ghost=true" | prepend: site.baseurl }}){:.button .lift-3 .rippleParent}
+[Source Code](https://github.com/Husenap/Husenap.github.io/tree/master/static/demos/tetris1984){:.button .lift-3 .rippleParent}
+[Read about the project](http://husenap.github.io/projects/2016/03/27/tetris-1984/){:.button .lift-3 .rippleParent}
 
