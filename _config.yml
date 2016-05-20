@@ -48,26 +48,26 @@ addressbar: "#FBC02D"
 #addressbar: "#455A64"
 
 #DARK THEME
-#theme1: "#000"
-#theme2: "#212121"
-#theme3: "#303030"
-#theme4: "#424242"
-#text: "#fff"
-#primary-text: 1
-#secondary-text: 0.7
-#hint-text: 0.5
-#divider: 0.12
+theme1: "#000"
+theme2: "#212121"
+theme3: "#303030"
+theme4: "#424242"
+text: "#fff"
+primary-text: 1
+secondary-text: 0.7
+hint-text: 0.5
+divider: 0.12
 
 #LIGHT THEME
-theme1: "#E0E0E0"
-theme2: "#F5F5F5"
-theme3: "#FAFAFA"
-theme4: "#FFFFFF"
-text: "#000"
-primary-text: 0.87
-secondary-text: 0.54
-hint-text: 0.38
-divider: 0.12
+#theme1: "#E0E0E0"
+#theme2: "#F5F5F5"
+#theme3: "#FAFAFA"
+#theme4: "#FFFFFF"
+#text: "#000"
+#primary-text: 0.87
+#secondary-text: 0.54
+#hint-text: 0.38
+#divider: 0.12
 
 
 # Build settings
