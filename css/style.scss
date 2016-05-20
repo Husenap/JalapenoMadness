@@ -61,21 +61,21 @@ $divider: {{ site.divider }};
 .font-headline, %font-headline {@include set-font(2.4rem, 500); @extend %primary-text-color;}
 .font-title, %font-title {@include set-font(2rem, 500); @extend %primary-text-color;}
 .font-subheading, %font-subheading {
-	color: rgba($color500, $primary-text);
+	color: rgba(lighten($color500, 15%), $primary-text);
 	@include set-font(1.5rem, 400);
 	@include media-query($on-palm){
 		@include set-font(1.6rem, 400);
 	}
 }
 .font-body, %font-body {
-	@include set-font(1.3rem, 300);
+	@include set-font(1.3rem, 400);
 	@extend %primary-text-color;
 	@include media-query($on-palm){
 		@include set-font(1.4rem, 300);
 	}
 }
 .font-body2, %font-body2 {
-	@include set-font(1.3rem, 500);
+	@include set-font(1.3rem, 600);
 	@extend %primary-text-color;
 	@include media-query($on-palm){
 		@include set-font(1.4rem, 500);

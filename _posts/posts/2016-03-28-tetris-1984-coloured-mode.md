@@ -14,9 +14,9 @@ permalink: /projects/:year/:month/:day/:title/
 
 ## Why?
 
-About a year ago, a friend asked if I could add [ghost pieces](http://tetris.wikia.com/wiki/Ghost_piece) to my Tetris 1984 verison.
+About a year ago, a friend of mine asked if I could add [ghost pieces](http://tetris.wikia.com/wiki/Ghost_piece) to my Tetris 1984 verison.
 I said no because I couldn't be arsed to do it.
-But since I already have a working function for [hard drops](http://tetris.wikia.com/wiki/Hard_Drop), I now thought that I would add support for both ghost and coloured pieces.
+But since I already have a working function for [hard drops](http://tetris.wikia.com/wiki/Hard_Drop), I decided that I would add support for both ghost and coloured pieces.
 
 ## What's new
 
@@ -31,7 +31,7 @@ if(Settings.COLOR){						// If settings allow colours
 }
 {% endhighlight %}
 
-### Ghost Piece
+### Ghost Pieces
 
 Adding support for the ghost piece was done with this simple function.
 
