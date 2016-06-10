@@ -1,0 +1,1158 @@
+<style>
+#b{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+#f{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 1024px;
+	height: 256px;
+}
+</style>
+<canvas id="b"></canvas>
+<canvas id="f"></canvas>
+<audio src="res/TurtleTheme.mp3" id="a"></audio>
+<script>
+window.AudioContext = window.AudioContext||window.webkitAudioContext;
+
+var ac = new AudioContext();
+var ana = ac.createAnalyser();
+var src = ac.createMediaElementSource(a);
+src.connect(ana);
+ana.connect(ac.destination)
+
+var freqs = new Uint8Array(ana.frequencyBinCount);
+var fseg = [0.1, 0.2, 0.3, 0.5, 0.6, 0.75];
+var freqParts = [];
+
+onload = function(){
+	gl = b.getContext("experimental-webgl");
+	ctx = f.getContext("2d");
+	f.width = 1024;
+	f.height = 256;
+
+	onresize = resize;
+	resize();
+	function resize(){
+		var qual = 2.0;
+		W = b.width = innerWidth/qual;
+		H = b.height = innerHeight/qual;
+		gl.viewport(0, 0, W, H);
+		
+		initFramebuffer();
+	}
+
+	initDemo();
+}
+
+
+function initDemo(){
+	var points = [-1, -1, -1, 1, 1, -1, 1, 1];
+	quad = new VertexBuffer(2, gl.FLOAT, new Float32Array(points));
+
+	//SHADERS
+	shaderEyes = new ShaderProgram("BASE", "eyes");
+	shaderSphereBox = new ShaderProgram("BASE", "sphereBox");
+	shaderTunnel = new ShaderProgram("BASE", "tunnel");
+	shaderPlasma = new ShaderProgram("BASE", "plasma");
+
+	shaderSandbox = new ShaderProgram("BASE", "sandbox");
+
+	//FX
+	fxBlur = new ShaderProgram("BASE", "FXblur");
+	fxTint = new ShaderProgram("BASE", "FXtint");
+	fxColor = new ShaderProgram("BASE", "FXcolor");
+	fxPixel = new ShaderProgram("BASE", "FXpixel");
+
+	bpm = 125;
+	timeline = [
+		//DEBUG
+		{
+			s: (t) => 0,
+			e: (t) => 8,
+			sh: shaderSandbox,
+			fx: fxBlur
+		},
+
+		//TUNNEL
+		{
+			s: function(t){return Math.max(8, (0|t)%2==0?t:Infinity)},
+			e: function(t){return Math.min(16, (0|t)%2==0?t+1:-1)},
+			sh: shaderTunnel,
+			fx: fxTint
+		},
+		{
+			s: function(t){return 0},
+			e: function(t){return 16},
+			sh: shaderTunnel,
+			fx: fxColor
+		},
+		{
+			s: function(t){return 16},
+			e: function(t){return 32},
+			sh: shaderTunnel,
+			fx: fxBlur,
+			t: 4
+		},
+
+		//EYES
+		{
+			s: function(){return 32},
+			e: function(){return 40},
+			sh: shaderEyes,
+			fx: fxColor,
+			t: -2
+		},
+		{
+			s: function(){return 40},
+			e: function(){return 48},
+			sh: shaderEyes,
+			fx: fxTint
+		},
+		{
+			s: function(){return 48},
+			e: function(){return 64},
+			sh: shaderEyes,
+			fx: fxBlur,
+			t: 1
+		},
+
+		//SPHERE BOX
+		{
+			s: function(){return 64},
+			e: function(){return 72},
+			sh: shaderSphereBox,
+			fx: fxColor,
+			t: -1
+		},
+		{
+			s: function(t){return (0|t)%2==0?t:Infinity},
+			e: function(t){return (0|t)%2==0?t+1:-1},
+			sh: shaderSphereBox,
+			fx: fxBlur
+		},
+		{
+			s: function(){return 72},
+			e: function(){return Infinity},
+			sh: shaderSphereBox,
+			fx: fxTint
+		},
+	];
+
+	a.play();
+	requestAnimationFrame(update);
+}
+function initFramebuffer(){
+	renderTarget = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, renderTarget);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, W, H, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+	fbo = gl.createFramebuffer();
+	gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, renderTarget, 0);
+}
+function update(){
+	requestAnimationFrame(update);
+	updateDemo();
+}
+function updateDemo(){
+	updateAudio();
+	
+	var time = a.currentTime * bpm / 120.0;
+
+	gl.viewport(0, 0, W, H);
+
+	for(var i = 0; i < timeline.length; i++){
+		var scene = timeline[i];
+		if(time >= scene.s(time) && time <= scene.e(time)){
+			var shader = scene.sh;
+			var fxShader = scene.fx;
+
+			//SHADER
+			gl.bindTexture(gl.TEXTURE_2D, null);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+
+			shader.bind();
+			shader.setFloatUniform("time", time);
+			shader.setVec2Uniform("res", [W, H]);
+
+			shader.setFloatUniform("fft_low", freqParts[0]);
+			shader.setFloatUniform("fft_mid", freqParts[1]);
+			shader.setFloatUniform("fft_high", freqParts[2]);
+
+			quad.bind(shader.getAttribLoc("p"));
+
+			gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+			//FX
+			gl.bindTexture(gl.TEXTURE_2D, renderTarget);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+			fxShader.bind();
+			fxShader.setFloatUniform("time", performance.now()/1000);
+			fxShader.setVec2Uniform("res", [W, H]);
+			fxShader.setSamplerUniform("img", 0);
+			
+			fxShader.setFloatUniform("fft_low", freqParts[0]);
+			fxShader.setFloatUniform("fft_mid", freqParts[1]);
+			fxShader.setFloatUniform("fft_high", freqParts[2]);
+
+			var alpha = 0.0;
+			if(scene.t != undefined){
+				var t = scene.t;
+				if(t > 0 && time >= scene.e(time) - t){
+					alpha = 1.0 - (scene.e(time) - time) / t;
+					console.log("out: ", alpha);
+				}
+				if(t < 0 && time <= scene.s(time) - t){
+					alpha = 1.0 - (scene.s(time) - time) / t;
+					console.log("in: ", alpha);
+				}
+			}
+			fxShader.setFloatUniform("trans", alpha);
+
+			gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+			break;
+		}
+	}
+	/* DEBUG FFT
+	ctx.save();
+	ctx.clearRect(0, 0, f.width, f.height);
+
+	cols = ["red", "green", "blue"];
+	for(var i = 0; i < 3; i++){
+		ctx.fillStyle = cols[i];
+		ctx.fillRect(f.width - (3-i) * 50, f.height, 50, -freqParts[i]*256);
+	}
+
+	var fs = freqs.length;
+	for(var i = 1; i < fs; i++){
+		ctx.beginPath();
+		ctx.moveTo((i-1)*(1024/fs), f.height - freqs[i-1]);
+		ctx.lineTo(i*(1024/fs), f.height - freqs[i]-5);
+		if(i > fseg[0]*fs && i < fseg[1]*fs){ ctx.strokeStyle = "red";
+		}else if(i > fseg[2]*fs && i < fseg[3]*fs){
+			ctx.strokeStyle = "green";
+		}else if(i > fseg[4]*fs && i < fseg[5]*fs){
+			ctx.strokeStyle = "blue";
+		}else{
+			ctx.strokeStyle = "white";
+		}
+		ctx.stroke();
+	}
+	ctx.restore();
+	*/
+}
+function updateAudio(){
+	ana.getByteFrequencyData(freqs);
+
+	var fs = freqs.length;
+	
+	freqParts = [0, 0, 0];
+	for(var i = Math.floor(fseg[0]*fs); i < fseg[1]*fs; i++)freqParts[0] += freqs[i];
+	for(var i = Math.floor(fseg[2]*fs); i < fseg[3]*fs; i++)freqParts[1] += freqs[i];
+	for(var i = Math.floor(fseg[4]*fs); i < fseg[5]*fs; i++)freqParts[2] += freqs[i];
+	freqParts[0] /= 255.0*(fseg[1]*fs-fseg[0]*fs);
+	freqParts[1] /= 255.0*(fseg[3]*fs-fseg[2]*fs);
+	freqParts[2] /= 255.0*(fseg[5]*fs-fseg[4]*fs);
+}
+
+function VertexBuffer(siz, typ, dat){
+	this.vbo = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+	gl.bufferData(gl.ARRAY_BUFFER, dat, gl.STATIC_DRAW);
+
+	this.bind = function(AI){
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+		gl.enableVertexAttribArray(AI);
+		gl.vertexAttribPointer(AI, siz, typ, false, 0, 0);
+	}
+}
+function ShaderProgram(idv, idf){
+	function compile(type, id){
+		var shader = gl.createShader(type);
+
+		var code = "";
+		if(type == gl.VERTEX_SHADER){
+			code = document.getElementById(idv+"-vs").textContent;
+		}else if(type == gl.FRAGMENT_SHADER){
+			code = document.getElementById(idf+"-fs").textContent;
+		}else{
+			return null;
+		}
+
+		gl.shaderSource(shader, code);
+		gl.compileShader(shader);
+
+		if(!gl.getShaderParameter(shader, gl.COMPILE_STATUS)){
+			alert(gl.getShaderInfoLog(shader));
+			return null;
+		}
+		return shader;
+	}
+
+	var vertexShader = compile(gl.VERTEX_SHADER, idv);
+	var fragmentShader = compile(gl.FRAGMENT_SHADER, idf);
+
+	this.program = gl.createProgram();
+	gl.attachShader(this.program, vertexShader);
+	gl.attachShader(this.program, fragmentShader);
+	gl.linkProgram(this.program);
+
+	if(!gl.getProgramParameter(this.program, gl.LINK_STATUS))alert("SHADER LINK FAILED");
+
+	this.bind = function(){gl.useProgram(this.program);}
+	this.getAttribLoc = function(name){
+		return gl.getAttribLocation(this.program, name);
+	}
+	this.setFloatUniform = function(name, value){
+		var loc = gl.getUniformLocation(this.program, name);
+		gl.uniform1f(loc, value);
+	}
+	this.setVec2Uniform = function(name, value){
+		var loc = gl.getUniformLocation(this.program, name);
+		gl.uniform2f(loc, value[0], value[1]);
+	}
+	this.setSamplerUniform = function(name, value){
+		var location = gl.getUniformLocation(this.program, name);
+		gl.uniform1i(location, value);
+	}
+}
+</script>
+
+<!-- SHADERS -->
+<script id="BASE-vs" type="x-shader/x-vertex">
+precision mediump float;
+
+attribute vec2 p;
+
+void main(){
+	gl_Position = vec4(p, 0, 1);
+}
+</script>
+<script id="eyes-fs" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform float time;
+uniform vec2 res;
+
+uniform float fft_low;
+uniform float fft_mid;
+uniform float fft_high;
+
+//===================
+//=== NOISE STUFF ===
+//===================
+vec4 mod289(vec4 x){ return x - floor(x * (1.0 / 289.0)) * 289.0; }
+vec4 permute(vec4 x){ return mod289(((x*34.0)+1.0)*x); }
+vec4 taylorInvSqrt(vec4 r){ return 1.79284291400159 - 0.85373472095314 * r; }
+vec2 fade(vec2 t){ return t*t*t*(t*(t*6.0-15.0)+10.0); }
+
+float cnoise(vec2 P){
+  vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
+  vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
+  Pi = mod289(Pi); // To avoid truncation effects in permutation
+  vec4 ix = Pi.xzxz;
+  vec4 iy = Pi.yyww;
+  vec4 fx = Pf.xzxz;
+  vec4 fy = Pf.yyww;
+
+  vec4 i = permute(permute(ix) + iy);
+
+  vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0 ;
+  vec4 gy = abs(gx) - 0.5 ;
+  vec4 tx = floor(gx + 0.5);
+  gx = gx - tx;
+
+  vec2 g00 = vec2(gx.x,gy.x);
+  vec2 g10 = vec2(gx.y,gy.y);
+  vec2 g01 = vec2(gx.z,gy.z);
+  vec2 g11 = vec2(gx.w,gy.w);
+
+  vec4 norm = taylorInvSqrt(vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11)));
+  g00 *= norm.x;  
+  g01 *= norm.y;  
+  g10 *= norm.z;  
+  g11 *= norm.w;  
+
+  float n00 = dot(g00, vec2(fx.x, fy.x));
+  float n10 = dot(g10, vec2(fx.y, fy.y));
+  float n01 = dot(g01, vec2(fx.z, fy.z));
+  float n11 = dot(g11, vec2(fx.w, fy.w));
+
+  vec2 fade_xy = fade(Pf.xy);
+  vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
+  float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
+  return 3.0 * n_xy;
+}
+
+float noise(vec2 p){
+	return 0.4+0.6*cnoise(p);
+}
+
+//=====================
+//=== READY SET ART ===
+//=====================
+
+float fbm(vec2 p){
+	float f = 0.0;
+	f += 0.5000 * noise(p); p *= 2.2;
+	f += 0.2500 * noise(p); p *= 2.3;
+	f += 0.1250 * noise(p); p *= 2.1;
+	f += 0.0625 * noise(p);
+	f /= 0.9375;
+	return f;
+}
+
+bool drawEye(vec2 eye, vec2 center, float size, out vec3 col, in vec3 background){
+	float r = dot(eye,eye);
+	vec2 dif = center-eye;
+	float a = atan(abs(dif.y), dif.x);
+
+	float ratio = (size/0.5);
+	float dist = length(center-eye);
+	float idist = length(-center-eye);
+
+	float ss = 0.5 + 0.5*sin(time);
+	float anim = 1.0 + (0.1+fft_low)*ss*clamp(1.0-r,0.0,1.0);
+	dist *= anim + fft_low*0.1;
+	r *= anim;
+
+	if(r < size){
+		col = vec3(0.0, 0.3, 0.4);
+
+		//DEFORM ALL ANGLES
+		a += 0.05*fbm(5.0*eye);
+
+		//BLUE FBM
+		float f = fbm((5.0+size)*eye);
+		col = mix(col, vec3(0.4, 0.3, 0.8), f);
+
+
+		//==============
+		//=== FIBERS ===
+		//==============
+		//WHITE FIBERS
+		f = smoothstep(0.1, 0.9, fbm(vec2(exp(2.0*idist*idist*idist), 20.0*a)));
+		col = mix(col, vec3(0.7, 0.9, 1.0), 0.8*f);
+
+		//BLACK FIBERS
+		f = smoothstep(0.3, 0.9, fbm(vec2(8.0*dist, 20.0*a)));
+		col = mix(col, vec3(0.05, 0.0, 0.1), 0.5*f);
+
+
+		//=============
+		//=== PUPIL ===
+		//=============
+		//ORANGE CENTER
+		f = 1.0 - smoothstep(0.25*ratio, 0.5*ratio, dist+0.3*fbm(vec2(5.0*dist,10.0*a)));
+		col = mix(col, vec3(0.9, 0.6, 0.2), 0.8*f);
+
+		//DARK CENTER
+		f = 1.0 - smoothstep(0.25*ratio, 0.5*ratio, dist+0.4*fbm(vec2(6.0*dist,10.0*a)));
+		col = mix(col, vec3(0.5, 0.3, 0.1), 0.5*f);
+
+		//PUPIL DARK GLOW
+		f = 1.0 - smoothstep(0.2*ratio, 0.4*ratio, dist+0.5*fbm(vec2(2.0*dist,8.0*a)));
+		col = mix(col, vec3(0.05, 0.0, 0.1), f);
+
+		//PUPIL PURPLE GLOW
+		f = 1.0 - smoothstep(0.15*ratio, 0.30*ratio, dist);
+		col = mix(col, vec3(0.1, 0.0, 0.2), f);
+
+		//PUPIL
+		f = smoothstep(0.19*ratio, 0.21*ratio, dist);
+		col *= f;
+
+
+		//=======================
+		//=== SPECULAR POINTS ===
+		//=======================
+		vec2 specOff = vec2(0.2, 0.3)+center*0.5;
+		//BIG SPECULAR POINT
+		f = 1.0 - smoothstep(0.0*ratio, 0.4*ratio, length(eye - specOff*ratio));
+		col += vec3(1.0, 0.9, 0.7)*f*0.8;
+
+		//SMALL SPECULAR POINT
+		f = 1.0 - smoothstep(0.0*ratio, 0.1*ratio, length(eye + 0.5*specOff*ratio));
+		col += vec3(1.0, 0.9, 0.7)*f*0.8;
+
+		//TINY SPECULAR POINT
+		f = 1.0 - smoothstep(0.0*ratio, 0.05*ratio, length(eye + specOff*ratio));
+		col += vec3(1.0, 0.9, 0.7)*f*0.8;
+		
+		
+		//===================
+		//=== FINAL TOUCH ===
+		//===================
+		//VIGNETTE
+		f = smoothstep(0.1*ratio, 0.7*ratio, r);
+		col = mix(col, vec3(0.1, 0.0, 0.2), f);
+
+		//SMOOTH EDGE
+		f = smoothstep(size-0.05, size, r);
+		col = mix(col, background, f);
+		return false;
+	}else{
+		return true;
+	}
+}
+
+void main(){
+	vec2 p = -1.0 + 2.0*(gl_FragCoord.xy / res.xy);
+	p.x *= res.x/res.y;
+
+	// REPEAT DOMAIN
+	vec2 q = p;
+	q *= 3.0 + fft_low*0.1 + 0.5*sin(time*0.2);
+	q.x += 10.0*cos(time*0.2+fft_high*0.1);
+	q.y += 10.0*sin(time*0.3-fft_mid*0.1);
+	q = mod(q+vec2(1.0), 2.0)-vec2(1.0);
+
+	vec3 background = vec3(fft_high*0.8, fft_mid*0.5, fft_low*0.3)*0.5;
+	vec3 col = background;
+
+	vec2 eye = q;
+	vec2 center = vec2(cos(0.1*time), sin(0.5*time))*0.1;
+
+	if(drawEye(eye, center, 0.8-dot(p,p), col, background))col = background;
+
+	gl_FragColor = vec4(col, 1.0);
+}
+</script>
+<script id="sphereBox-fs" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform float time;
+uniform vec2 res;
+
+uniform float fft_low;
+uniform float fft_mid;
+uniform float fft_high;
+
+const vec3 g_forward = vec3(0.0, 0.0, -1.0);
+const vec3 g_right = vec3(1.0, 0.0, 0.0);
+const vec3 g_up = vec3(0.0, 1.0, 0.0);
+
+float g_focalLength = 1.97; // Distance between the eye and the image plane
+const float g_zNear = 0.0; // Near clip depth
+const float g_zFar = 25.0; // Far clip depth
+
+const int g_steps = 64; // Max raymarch steps
+const float g_epsilon = 0.001; // Surface threshold
+
+vec3 g_lightPos = vec3(0.0);
+vec4 g_lightCol = vec4(1.0, 0.2, 0.0, 1.0);
+
+//const vec4 g_skyColor = vec4(0.31, 0.47, 0.67, 1.0);
+vec4 g_skyColor = vec4(0, 0, 0, 1.0);
+const vec4 g_ambient = vec4(0.15, 0.2, 0.32, 1.0);
+
+
+//HELPER FUNCTION
+float mapTo(float x, float minX, float maxX, float minY, float maxY){
+	float a = (maxY - minY) / (maxX - minX);
+	float b = minY - a * minX;
+	return a * x + b;
+}
+
+float udBox(vec3 p, vec3 s){
+	return length(max(abs(p) - s, vec3(0.0)));
+}
+float sdBox(vec3 p, vec3 s){
+	vec3 d = abs(p) - s;
+	return min(max(d.x, max(d.y, d.z)), 0.0) + udBox(p, s);
+}
+float sdSphere(vec3 p, float radius){
+	return length(p) - radius;
+}
+float opSubtract(float da, float db){
+	return max(da, -db);
+}
+float opIntersect(float da, float db){
+	return max(da, db);
+}
+float opUnion(float da, float db){
+	return min(da, db);
+}
+vec3 opTwist(vec3 p){
+	float c = cos(0.25*p.y);
+	float s = sin(0.25*p.y);
+	mat2 m = mat2(c, -s, s, c);
+	return vec3(m*p.xz, p.y);
+}
+
+float distScene(vec3 p){
+	float d0 = sdSphere(p, 1.5);
+	float dist = 2.0 + fft_mid*2.0;
+	float d1 = sdSphere(p - vec3(-sin(time)*dist, cos(time)*dist, 0), 0.5);
+
+	vec3 q = p;
+	q = mod(opTwist(p), 0.6) - vec3(0.3);
+	float extrusionField0 = sdBox(q, vec3(0.1));
+
+	float df = opUnion(d0, d1);
+	float df0 = opIntersect(df, extrusionField0);
+	float ball = opUnion(df0, df+1.5-fft_low*2.5);
+
+	float box = -sdBox(p, vec3(8.0, 6.0, 7.0));
+
+	return opUnion(ball, box);
+}
+
+vec3 getNormal(vec3 p){
+	float h = 0.0001;
+
+	return normalize(vec3(
+				distScene(p + vec3(h, 0, 0)) - distScene(p - vec3(h, 0, 0)),
+				distScene(p + vec3(0, h, 0)) - distScene(p - vec3(0, h, 0)),
+				distScene(p + vec3(0, 0, h)) - distScene(p - vec3(0, 0, h))));
+}
+
+float getShadow(vec3 p0, vec3 p1, float k){
+	vec3 dir = normalize(p1-p0);
+	float t = 10.0*g_epsilon;
+	float maxT = length(p1-p0);
+	float f = 1.0; //penumbra
+	for(int i = 0; i < g_steps; ++i){
+		float d = distScene(p0 + dir * t);
+
+		if(d < g_epsilon)
+			return 0.0;
+
+		f = min(f, k*d/t);
+
+		t += d;
+		
+		if(t >= maxT)
+			break;
+	}
+	return f;
+}
+
+float ambientOcclusion(vec3 p, vec3 n){
+	float stepSize = 0.01;
+	float t = stepSize;
+	float oc = 0.0;
+	for(int i = 0; i < g_steps/4; ++i){
+		float d = distScene(p + n * t);
+		oc += t - d;
+		t += stepSize;
+	}
+	return clamp(oc, 0.0, 1.0);
+}
+
+vec4 getShading(vec3 p, vec3 n, vec3 lp, vec4 lc){
+	float lI = 0.0; //lightIntensity
+	float shadow = getShadow(p, lp, 16.0); 
+	if(shadow > 0.0){
+		vec3 ld = normalize(lp-p); // lightDirection
+		lI = shadow * clamp(dot(n, ld), 0.0, 1.0);
+	}
+	return lc * lI + g_ambient * (1.0 - lI);
+}
+
+void raymarch(vec3 pos, vec3 dir, out int i, out float t){
+	t = 0.0;
+	for(int j = 0; j < g_steps; ++j){
+		vec3 p = pos + dir * t;
+		float d = distScene(p);
+		if(d < g_epsilon || t > g_zFar){
+			i = j;
+			break;
+		}
+		t += d;
+	}
+}
+
+vec4 computeColor(vec3 pos, vec3 dir){
+	float t0;
+	int i;
+	raymarch(pos, dir, i, t0);
+
+	vec3 p;
+	vec3 n;
+	float t;
+	vec4 texture = vec4(1.0);
+
+		t = t0;
+		p = pos + dir * t0;
+		n = getNormal(p);
+
+	vec4 color;
+	float z = mapTo(t, g_zNear, g_zFar, 1.0, 0.0);
+
+	color = texture * (
+			getShading(p, n, g_lightPos, g_lightCol)
+			);
+
+	float ao = ambientOcclusion(p, n);
+	color *= 1.0 - ao;
+
+	float z2 = z*z;
+	color = mix(g_skyColor, color, z2 * (3.0 - 2.0 * z));
+
+	return color;
+}
+
+mat3 rotationMatrix(vec3 axis, float angle){
+	axis = normalize(axis);
+	float s = -sin(angle);
+	float c = cos(angle);
+	float oc = 1. - c;
+
+	return mat3(oc * axis.x * axis.x + c,			oc * axis.x * axis.y - axis.z * s,	oc * axis.z * axis.x + axis.y * s,
+				oc * axis.x * axis.y + axis.z * s,	oc * axis.y * axis.y + c,			oc * axis.y * axis.z - axis.x * s,
+				oc * axis.z * axis.x - axis.y * s,	oc * axis.y * axis.z + axis.x * s,	oc * axis.z * axis.z + c		);
+}
+
+vec3 calcDirection(){
+	float AR = res.x / res.y;
+	float u = gl_FragCoord.x * 2.0 / res.x - 1.0;
+	float v = gl_FragCoord.y * 2.0 / res.y - 1.0;
+	vec3 res = normalize(g_forward * g_focalLength + g_right * u * AR + g_up * v);
+	return res;
+}
+
+void update(){
+	float ld = 3.0;
+	g_lightPos = vec3(sin(time)*ld, cos(time)*ld, sin(time*4.0)*ld);
+	g_lightCol = vec4(1.0-fft_high, 1.0-fft_mid, 1.0-fft_low, 1.0);
+	g_skyColor = clamp(vec4(0.31+fft_high, 0.47+fft_mid, 0.67-fft_low, 1.0), 0.0, 1.0);
+}
+
+void main(){
+	update();
+
+	float radius = 5.0 + fft_low*2.0;
+	float fft_mod = fft_high;
+	vec3 pos = vec3(-sin(time+fft_mod)*radius, sin(0.5*time)*radius*0.5, cos(time+fft_mod)*radius);
+	vec3 dir = calcDirection();
+	dir *= rotationMatrix(vec3(1, 0, 0), sin(0.5*time)*0.5);
+	dir *= rotationMatrix(vec3(0, 1, 0), time+fft_mod);
+
+	vec4 color = computeColor(pos, dir);
+	
+	gl_FragColor = vec4(color.xyz, 1.0);
+}
+</script>
+<script id="tunnel-fs" type="x-shader/x-fragment">
+precision mediump float;
+
+#define PI 3.1415926535897932384626433832795
+
+uniform float time;
+uniform vec2 res;
+
+uniform float fft_low;
+uniform float fft_mid;
+uniform float fft_high;
+
+const vec3 g_forward = vec3(0.0, 0.0, -1.0);
+const vec3 g_right = vec3(1.0, 0.0, 0.0);
+const vec3 g_up = vec3(0.0, 1.0, 0.0);
+
+float g_focalLength = 1.97; // Distance between the eye and the image plane
+const float g_zNear = 0.0; // Near clip depth
+const float g_zFar = 100.0; // Far clip depth
+
+const int g_steps = 64; // Max raymarch steps
+const float g_epsilon = 0.0001; // Surface threshold
+
+vec3 g_lightPos = vec3(0.0);
+vec4 g_lightCol = vec4(1.0, 0.2, 0.0, 1.0);
+
+//const vec4 g_skyColor = vec4(0.31, 0.47, 0.67, 1.0);
+vec4 g_skyColor = vec4(vec3(0.0), 1.0);
+const vec4 g_ambient = vec4(vec3(0.3), 1.0);
+
+
+//HELPER FUNCTION
+float mapTo(float x, float minX, float maxX, float minY, float maxY){
+	float a = (maxY - minY) / (maxX - minX);
+	float b = minY - a * minX;
+	return a * x + b;
+}
+
+float udBox(vec3 p, vec3 s){
+	return length(max(abs(p) - s, vec3(0.0)));
+}
+float sdBox(vec3 p, vec3 s){
+	vec3 d = abs(p) - s;
+	return min(max(d.x, max(d.y, d.z)), 0.0) + udBox(p, s);
+}
+float sdSphere(vec3 p, float radius){
+	return length(p) - radius;
+}
+float sdTunnel(vec3 p, float r){
+	return length(p.xy) - r;
+}
+float opSubtract(float da, float db){
+	return max(da, -db);
+}
+float opIntersect(float da, float db){
+	return max(da, db);
+}
+float opUnion(float da, float db){
+	return min(da, db);
+}
+vec3 opTwist(vec3 p){
+	float c = cos(0.25*p.y);
+	float s = sin(0.25*p.y);
+	mat2 m = mat2(c, -s, s, c);
+	return vec3(m*p.xz, p.y);
+}
+float fixDistance (in float d, in float correction, in float k) {
+	float DELTA = 0.01;
+	correction = max (correction, 0.0);
+	k = clamp (k, 0.0, 1.0);
+	return min (d, max ((d - DELTA) * k + DELTA, d - correction));
+}
+
+vec3 tunnelPath(vec3 p){
+	return vec3(5.0*sin(p.z*0.05), 7.0*sin(p.z*0.05), 0.0);
+}
+
+float distScene(vec3 p){
+	p += tunnelPath(p);
+
+	return -sdTunnel(p, 10.0+fft_low*4.0) + 1.0 * sin(atan(p.y, p.x)*5.0) * sin(p.z);
+}
+
+vec3 getNormal(vec3 p){
+	float h = 0.01;
+	
+	return normalize(vec3(
+				distScene(p + vec3(h, 0, 0)) - distScene(p - vec3(h, 0, 0)),
+				distScene(p + vec3(0, h, 0)) - distScene(p - vec3(0, h, 0)),
+				distScene(p + vec3(0, 0, h)) - distScene(p - vec3(0, 0, h))));
+}
+
+void raymarch(vec3 pos, vec3 dir, out int i, out float t){
+	t = 0.0;
+	for(int j = 0; j < g_steps; ++j){
+		vec3 p = pos + dir * t;
+		float d = distScene(p);
+		if(d < g_epsilon || t > g_zFar){
+			i = j;
+			break;
+		}
+		t += d;
+	}
+}
+
+vec4 computeColor(vec3 pos, vec3 dir){
+	float t0;
+	int i;
+	raymarch(pos, dir, i, t0);
+
+	vec3 p;
+	vec3 n;
+	float t;
+
+	t = t0;
+	p = pos + dir * t0;
+	n = getNormal(p);
+
+	vec3 blue = vec3(0.0, 0.65, 1.0);
+    vec3 red  = vec3(1.0, 0.0, 0.65);
+
+	vec4 texture = vec4(
+		mix(blue, red, step(0.5, fract(p.z/25.0))),
+		1.0
+	);
+
+
+	// PLASMA SHADER
+	vec3 uv = p;
+
+	float v	= 0.0;
+	v += sin(uv.z+time);
+	v += sin((uv.z+time*20.0)/2.0);
+	v += sin((uv.z+uv.y+time*20.0)/3.0);
+	uv += 20.0 / 2.0 * vec3(cos(time/4.0)-1.0, sin(time/3.0)-1.0, cos(time/2.0)-1.0);
+	v += sin(sqrt(uv.x*uv.x+uv.y*uv.y+1.0)+time);
+	v /= 20.0;
+
+	vec3 col = vec3(
+		sin(PI*v*2.0),
+		0.5*cos(PI*v) + sin(PI*v + 3.0*PI/3.0) + 0.5*sin(v+time),
+		0.5*cos(PI*v + 5.0*PI/2.0) + cos(PI*v + 5.0*PI/2.0 + time*4.0) + fft_low
+	);
+
+	texture = vec4(mix(
+		col,
+		texture.rgb,
+		0.5
+		)
+	, 1.0);
+	// PLASMA SHADER END
+
+
+	float z = mapTo(t, g_zNear, g_zFar, 1.0, 0.0);
+
+	vec4 color = texture;
+
+	float z2 = z*z;
+	color = mix(g_skyColor, color, z2 * (3.0 - 2.0 * z));
+
+	return color;
+}
+
+mat3 rotationMatrix(vec3 axis, float angle){
+	axis = normalize(axis);
+	float s = -sin(angle);
+	float c = cos(angle);
+	float oc = 1. - c;
+
+	return mat3(oc * axis.x * axis.x + c,			oc * axis.x * axis.y - axis.z * s,	oc * axis.z * axis.x + axis.y * s,
+				oc * axis.x * axis.y + axis.z * s,	oc * axis.y * axis.y + c,			oc * axis.y * axis.z - axis.x * s,
+				oc * axis.z * axis.x - axis.y * s,	oc * axis.y * axis.z + axis.x * s,	oc * axis.z * axis.z + c		);
+}
+
+vec3 calcDirection(){
+	float AR = res.x / res.y;
+	float u = gl_FragCoord.x * 2.0 / res.x - 1.0;
+	float v = gl_FragCoord.y * 2.0 / res.y - 1.0;
+	vec3 res = normalize(g_forward * g_focalLength + g_right * u * AR + g_up * v);
+	return res;
+}
+
+void update(){
+	g_lightPos = vec3(0, 0, -10.0*(2.0*time+2.0+cos(time)));
+	g_lightPos -= tunnelPath(g_lightPos);
+
+	g_lightCol = vec4(fft_low, fft_mid, fft_high, 1.0);
+}
+
+void main(){
+	vec2 uv = gl_FragCoord.xy / res.xy;
+
+	float radius = 1.0;
+	float fft_mod = fft_high;
+	vec3 pos = vec3(0.0, 0.0, -(50.0)*time);
+	pos -= tunnelPath(pos);
+
+	vec3 dir = calcDirection();
+	dir *= rotationMatrix(vec3(0, 0, 1), time+fft_low*2.0);
+	dir *= rotationMatrix(vec3(0, 1, 0), -pos.x/20.0);
+	dir *= rotationMatrix(vec3(1, 0, 0), pos.y/20.0);
+
+	update();
+
+	vec4 color = computeColor(pos, dir);
+	
+	gl_FragColor = vec4(color.xyz, 1.0);
+}
+</script>
+<script id="plasma-fs" type="x-shader/x-fragment">
+precision mediump float;
+#define PI 3.1415926535897932384626433832795
+
+uniform float time;
+uniform vec2 res;
+
+uniform float fft_low;
+uniform float fft_mid;
+uniform float fft_high;
+
+void main(){
+	vec2 uv = gl_FragCoord.xy/res * 20.0;
+
+	float v	= 0.0;
+
+	v += sin(uv.x+time);
+	v += sin((uv.y+time)/2.0);
+	v += sin((uv.x+uv.y+time)/3.0);
+
+	uv += 20.0 / 2.0 * vec2(sin(time/3.0)-1.0, cos(time/2.0)-1.0);
+	v += sin(sqrt(uv.x*uv.x+uv.y*uv.y+1.0)+time);
+
+	v /= 2.0;
+
+	vec3 col = vec3(
+		sin(PI*v),
+		sin(PI*v) + sin(PI*v + 4.0*PI/3.0),
+		sin(PI*v) + 0.5*sin(PI*v + 4.0*PI/3.0) + cos(PI*v + 5.0*PI/2.0)
+	);
+
+	gl_FragColor = vec4(col*0.5 + 0.5, 1.0);
+}
+</script>
+<script id="sandbox-fs" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform float time;
+uniform vec2 res;
+
+uniform float fft_low;
+uniform float fft_mid;
+uniform float fft_high;
+
+vec2 uv;
+
+vec3 drawScene(vec2 p){
+	float r = 0.1;
+	vec2 q = uv - p;
+	float a = atan(p.y, p.x);
+
+	float dist = length(p);
+
+	float v = smoothstep(r, r+0.02, dist);
+
+	vec3 col = mix(
+		vec3(step(0.4, fract(dist*(5.0+fft_mid*100.0))), 1.0, 0.5),
+		vec3(0.0),
+		v
+	);
+
+	return col;
+}
+
+void main(){
+	vec2 uv = -1.0 + 2.0 * gl_FragCoord.xy/res;
+	uv.x *= res.x/res.y;
+
+	vec2 p;
+	vec3 res = vec3(0.0);
+	float time = time*8.0;
+	float t;
+	const int nSamples = 8;
+	for(int i = 1; i <= nSamples; ++i){
+		p = uv;
+		float blur = (float(i) / float(nSamples))-0.5;
+		t = time + 0.1*blur;
+		p.x += sin(t*2.0);
+		p.y += 0.8*sin(t);
+		res += drawScene(mod(p, 1.0) - 0.5);
+	}
+	res /= float(nSamples);
+
+	gl_FragColor = vec4(res, 1.0);
+}
+</script>
+
+
+<!-- FX -->
+<script id="FXcolor-fs" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform float time;
+uniform vec2 res;
+uniform sampler2D img;
+
+uniform float fft_low;
+uniform float fft_mid;
+uniform float fft_high;
+
+uniform float trans;
+
+void main(){
+	vec2 uv = gl_FragCoord.xy / res;
+
+	gl_FragColor = mix(
+		vec4(texture2D(img, uv).rgb, 1.0),
+		vec4(vec3(0.0), 1.0),
+		clamp(trans, 0.0, 1.0)
+	);
+}
+</script>
+<script id="FXtint-fs" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform float time;
+uniform vec2 res;
+uniform sampler2D img;
+
+uniform float fft_low;
+uniform float fft_mid;
+uniform float fft_high;
+
+uniform float trans;
+
+void main(){
+	vec2 uv = gl_FragCoord.xy / res;
+
+	vec4 color = texture2D(img, uv);
+	color.gb *= 0.5;
+
+	gl_FragColor = mix(
+		vec4(color.rgb, 1.0),
+		vec4(vec3(0.0), 1.0),
+		clamp(trans, 0.0, 1.0)
+	);
+}
+</script>
+<script id="FXblur-fs" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform float time;
+uniform vec2 res;
+uniform sampler2D img;
+
+uniform float fft_low;
+uniform float fft_mid;
+uniform float fft_high;
+
+uniform float trans;
+
+void main(){
+	vec2 uv = gl_FragCoord.xy / res;
+
+	float delta = fft_low/30.0;
+	vec4 color = vec4(0.0);
+	color += texture2D(img, uv + vec2(delta, 0.0));
+	color += texture2D(img, uv + vec2(-delta, 0.0));
+	color += texture2D(img, uv + vec2(0.0, delta));
+	color += texture2D(img, uv + vec2(0.0, -delta));
+	color /= 4.0;
+
+	gl_FragColor = mix(
+		vec4(color.rgb, 1.0),
+		vec4(vec3(0.0), 1.0),
+		clamp(trans, 0.0, 1.0)
+	);
+}
+</script>
+<script id="FXpixel-fs" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform float time;
+uniform vec2 res;
+uniform sampler2D img;
+
+uniform float fft_low;
+uniform float fft_mid;
+uniform float fft_high;
+
+uniform float trans;
+
+void main(){
+	vec2 uv = gl_FragCoord.xy / res.xy;
+
+	float scale = 100.0 - fft_low * 100.0;
+	float ar = res.x/res.y;
+	uv = vec2(
+		floor(uv.x*scale*ar)/(scale*ar),
+		floor(uv.y*scale)/scale
+	);
+
+
+	vec4 color = texture2D(img, uv);
+
+	gl_FragColor = mix(
+		vec4(color.rgb, 1.0),
+		vec4(vec3(0.0), 1.0),
+		clamp(trans, 0.0, 1.0)
+	);
+}
+</script>
+
