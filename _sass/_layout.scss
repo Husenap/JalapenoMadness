@@ -1,7 +1,6 @@
 //SITE HEADER
 .site-header {
 	background: $color500;
-	@extend %checkerPattern;
 }
 .fake-nav { opacity: 0; }
 .site-header-active {
@@ -59,7 +58,6 @@
 	left: 0;
 	width: 100%;
 	z-index: 1000 !important;
-	@extend %checkerPattern;
 }
 .site-nav {
 	float: right;
@@ -140,7 +138,6 @@
 .site-footer {
 	padding: $space 0;
 	background: $color500;
-	@extend %checkerPattern;
 }
 .footer-heading {
 	@extend %font-title;
