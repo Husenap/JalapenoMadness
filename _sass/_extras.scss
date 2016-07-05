@@ -1,3 +1,4 @@
+//HOVER CARDS
 .lift-3,
 %lift-3 {
 	@include smooth-transition(150ms);
@@ -6,6 +7,17 @@
 	}
 }
 
+.lifted-3,
+%lifted-3 {
+	@include set-z(3);
+}
+
+
+//CHECKERBOARD PATTERN
+%checkerPattern{
+	background-image: url(/static/img/site/checkerPattern.png);
+	image-rendering: pixelated;
+}
 
 
 // RIPPLE EFFECT

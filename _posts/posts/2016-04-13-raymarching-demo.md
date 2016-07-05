@@ -17,7 +17,7 @@ permalink: /posts/:year/:month/:day/:title/
 ## What is the Demoscene?
 
 > The demoscene is an international computer art subculture that specializes in producing demos: small, self-contained computer programs that produce audio-visual presentations. The main goal of a demo is to show off programming, artistic, and musical skills.
-> 
+>
 > <small>[Demoscene (wikipedia)](https://en.wikipedia.org/wiki/Demoscene)</small>
 
 
@@ -26,7 +26,7 @@ permalink: /posts/:year/:month/:day/:title/
 What's this good for? What can you do with it? It's just an animation.
 
 Well, sometimes a demo can be a lot more than just a crazy animation, sometimes a demo can become a piece of art.
-Since I find demos to be extremely interesting, I decided that I would create a little demo just to get used to some of the techniques that are required for making one. 
+Since I find demos to be extremely interesting, I decided that I would create a little demo just to get used to some of the techniques that are required for making one.
 
 Hopefully, I will learn a lot more about this in the future and become even better because the joy of making something beautiful is indescribable.
 

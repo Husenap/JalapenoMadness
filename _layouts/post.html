@@ -14,7 +14,7 @@ layout: default
 		<a id="comment-count" href="#" data-disqus-identifier="{{ page.title }}/{{ page.date }}">0 Comments</a>
 	</ul>
 </h1>
-{% if page.thumb %}<img src="{{ page.thumb | prepend: site.baseurl }}">{% endif %}
+{% if page.thumb %}<img src="{{ page.thumb | prepend: site.baseurl }}" class="lifted-3">{% endif %}
 <hr>
 
 <div class="post-content">
@@ -25,7 +25,7 @@ layout: default
 		<ul class="table-of-contents"></ul>
 		<hr>
 	</div>
-	
+
 	{{ content }}
 
 	<div id="disqus_thread"></div>
@@ -40,7 +40,7 @@ layout: default
 			$(link).attr("href", location.origin + location.pathname + "#" + header.id);
 			$(link).text(header.textContent);
 			var li = $('<li>').append(link);
-			$(li).css("margin-left", (parseInt(header.localName.match(/[1-6]/))-2)*2 + "rem");
+			$(li).css("margin-left", (+header.localName.match(/[1-6]/)-3)*2 + "rem");
 			$(".table-of-contents").append(li);
 		});
 	</script>

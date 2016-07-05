@@ -14,7 +14,8 @@ body {
 	font-family: $font-family;
 	@extend %font-body;
 	word-break: break-word;
-	background: $theme3;
+	background-color: $theme3;
+	@extend %checkerPattern;
 }
 
 //VERTICAL RHYTHM
@@ -133,7 +134,8 @@ code.highlighter-rouge {
 	background: #424242;
 	color: $accent200;
 	border: 1px solid $accent400;
-	padding: 0.2rem;
+	padding: 0 0.2rem;
+	margin-bottom: 0.2rem;
 }
 
 //BOLD TEXT
