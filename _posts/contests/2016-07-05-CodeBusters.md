@@ -270,7 +270,7 @@ I'm really thankful that CG hosts these contests since there is so much to learn
 
 We have yet to know what we can learn from the next CG contest, [HyperSonic](https://www.codingame.com/contests/hypersonic)!
 
-I'm very excited for it, expect me in the arena! ;)
+I'm very excited about it, expect me in the arena! ;)
 
 
 ## Links
