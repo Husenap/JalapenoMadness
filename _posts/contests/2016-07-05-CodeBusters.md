@@ -7,7 +7,7 @@ topics:
 - Artificial Intelligence
 - JavaScript
 - CodinGame
-date: 2016-07-03 22:51:00 +0200
+date: 2016-07-05 23:24:00 +0200
 decription: CodeBusters is one of the many programming contests held by CodinGame where you program an AI that plays against other AIs made by other people.
 permalink: /contests/:year/:month/:day/:title/
 ---
