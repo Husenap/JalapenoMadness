@@ -4,6 +4,7 @@ _site
 .DS_Store
 *.swp
 themes/
+_config.yml
 
 static/extra/DISQUS_URL_MAPPER.csv
 
