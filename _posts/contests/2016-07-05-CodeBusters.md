@@ -12,6 +12,20 @@ decription: CodeBusters is one of the many programming contests held by CodinGam
 permalink: /contests/:year/:month/:day/:title/
 ---
 
+## What's a CodinGame Contest?
+
+A CodinGame Contest is an online programming contest where the coders are presented with a game that they have to program an [AI](https://en.wikipedia.org/wiki/Artificial_intelligence) for.
+Your AI then gets ranked depending on how well it battles against the other AIs.
+
+![]({{ "/static/img/contests/codebusters/leagues.png" | prepend: site.baseurl }}){:.right-half}
+
+### League System
+
+The most recent contests have been 8 days long, and there's a fairly new league system.
+You start out at the far left, in the wood league, and have to work your way up to the top by ranking better than the boss in the arena.
+This is a very fun way of seeing how you progress through the contest.
+
+
 ## Preparation
 
 Before the contest started I decided to not program for a while, because I knew that I would be programming a lot for 8 days.
@@ -61,7 +75,7 @@ I made a very basic state machine where the busters decided what to do in the fo
 ![]({{ "/static/img/contests/codebusters/rank5th.png" | prepend: site.baseurl }}){:.right-half}
 
 With around 70 lines of code, these simple commands got me to the awesome rank of 5/531.
-But there was still 6 days to go, a lot was going to happen!
+But there were still 6 days to go, a lot was going to happen!
 
 ### Offline Simulator
 
@@ -173,11 +187,11 @@ I was ranked around 200 in the gold league which I wasn't happy with, so it was 
 
 ## Saturday(Day 8) &ndash; Time For a Change
 
-My code from Sunday was simply not enough to rank well near the end of the contest, so I decided to change things up a bit.
+My code from Sunday was simply not enough to rank well near the end of the contest, so I decided to try something new.
 
 ### Decision Tree
 
-The way I decided to go was by using a decision tree, it was the first time that I use one.
+The way I decided to go was by using a decision tree, it was the first time that I used one.
 I ended up with something along these lines:
 
 ![]({{ "/static/img/contests/codebusters/decisionTree.png" | prepend: site.baseurl }})
@@ -226,7 +240,7 @@ I managed to jump from rank 200 in gold, to rank 23.
 
 The final day of the contest was here! These 8 days had felt like forever, but at the same time super short.
 
-I spent the last day trying to tweak my busters' behaviours and made a few changes:
+I spent the last day trying to tweak my busters' behaviour and made a few changes:
 
 * I tried squaring the values in the sorting function explained above to give more importance to the distance, this way, my busters would rather pick a 15 ghost that is close to my base than picking a 3 ghost that is very far away, since I can't be sure it's still there.
 * I also told my busters to go camp at the enemy base once there were no ghosts left on the map, of the ones my busters knew of, that is.
@@ -237,16 +251,16 @@ Maybe that's because of TrueSkill, who knows?
 I resubmitted the previous submission again and it didn't rank as well as before, but I went with it anyway and finally ended up at rank 216/1'984.
 
 
-## Wrapping it up
+## Wrapping It Up
 
 All in all, this contest has been amazing, as usual, and I feel like the CG team are getting better at this after each contest.
 
-### The league system
+### The League System
 
-The league system is something that I personally find really nice, because it makes leaderboard climbing much more fun.
+The league system is something that I personally find really exciting, because it makes leaderboard climbing so much more fun.
 However, it would be nice to be able to play against people outside of your league, as long as the rules are the same, such as the gold and legend leagues.
 
-### Contests are great for learning
+### Contests Are Great For Learning
 
 I'm really thankful that CG hosts these contests since there is so much to learn!
 
@@ -256,7 +270,7 @@ I'm really thankful that CG hosts these contests since there is so much to learn
 
 We have yet to know what we can learn from the next CG contest, [HyperSonic](https://www.codingame.com/contests/hypersonic)!
 
-I'm very excited for it, and as always, see you in the arena! ;)
+I'm very excited for it, expect me in the arena! ;)
 
 
 ## Links
