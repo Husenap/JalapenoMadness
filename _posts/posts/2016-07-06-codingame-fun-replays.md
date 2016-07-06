@@ -32,6 +32,14 @@ It shouldn't be too difficult to understand.
 For the lyrics, I decided to save the data in an object which made it easy for me to pick which game step and which buster would say what.
 The format I decided to go with was `"turn:id" : "message"`.
 
+The options for this replay were:
+
+{% highlight ini %}
+ghosts=49
+seed=1
+busters=5
+{% endhighlight %}
+
 {% highlight javascript linenos %}
 //CHOREOGRAPHY
 let step = 0;
@@ -79,6 +87,7 @@ while(true){
 	//Loops through the busters and coordinates them
 	for(let buster of busters){
 		// Get the lyric for the current buster
+
 		let message = lyrics[[step, buster.id].join(":")];
 		if(message===undefined)message="";
 
@@ -88,7 +97,7 @@ while(true){
 			// This is the herding part where the busters go out to the
 			// edges and herd the ghosts towards the center. But it also
 			// includes the part where the busters run around in a circle
-			// and to the stun train.
+			// and do the stun train.
 
 			// Here is the condition for the stun train, notice the continue;
 			if(radius == 2600 && stun<=0){
@@ -98,29 +107,30 @@ while(true){
 
 			// Herding
 			let targetPoint = new Point(
-					8000 + radius*Math.cos(startAngle - buster.id*(Math.PI/5)),
-					4500 + radius*Math.sin(startAngle - buster.id*(Math.PI/5))
-					);
+				8000 + radius*Math.cos(startAngle - buster.id*(Math.PI/5)),
+				4500 + radius*Math.sin(startAngle - buster.id*(Math.PI/5))
+			);
 			targetPoint.round();
 			print("MOVE", targetPoint.x, targetPoint.y, message);
 		}else if(step < 150){
 			// === SECOND PART ===
 			// This is when the busters stun each other one at a time which
-			// gives a cool wave motion.
+			// gives a cool circular wave motion.
 
-			if(stunCircle == buster.id)
+			if(stunCircle == buster.id){
 				print("STUN", (buster.id+1)%10, message);
-			else
+			}else{
 				print("MOVE", buster.x, buster.y, message);
+			}
 		}else if(step < 152){
 			// This is the small part where the busters go in to the center
 			// to get in range for busting the ghosts
 
 			radius = 1400;
 			let targetPoint = new Point(
-					8000 + radius*Math.cos(startAngle - buster.id*(Math.PI/5)),
-					4500 + radius*Math.sin(startAngle - buster.id*(Math.PI/5))
-					);
+				8000 + radius*Math.cos(startAngle - buster.id*(Math.PI/5)),
+				4500 + radius*Math.sin(startAngle - buster.id*(Math.PI/5))
+			);
 			targetPoint.round();
 			print("MOVE", targetPoint.x, targetPoint.y, message);
 		}else if(step < 155){
@@ -133,9 +143,9 @@ while(true){
 			// thank the CG team.
 
 			let targetPoint = new Point(
-					8000 + radius*Math.cos(startAngle - buster.id*(Math.PI/5)),
-					4500 + radius*Math.sin(startAngle - buster.id*(Math.PI/5))
-					);
+				8000 + radius*Math.cos(startAngle - buster.id*(Math.PI/5)),
+				4500 + radius*Math.sin(startAngle - buster.id*(Math.PI/5))
+			);
 			targetPoint.round();
 			print("MOVE", targetPoint.x, targetPoint.y, message);
 		}else if(step < 195){
@@ -146,9 +156,9 @@ while(true){
 			// This is the finale where the busters position themselves in a pentagon.
 
 			let targetPoint = new Point(
-					8000 + (radius + 700*(buster.id%2))*Math.cos(startAngle - buster.id*(Math.PI/5)),
-					4500 + (radius + 700*(buster.id%2))*Math.sin(startAngle - buster.id*(Math.PI/5))
-					);
+				8000 + (radius + 700*(buster.id%2))*Math.cos(startAngle - buster.id*(Math.PI/5)),
+				4500 + (radius + 700*(buster.id%2))*Math.sin(startAngle - buster.id*(Math.PI/5))
+			);
 			targetPoint.round();
 			print("MOVE", targetPoint.x, targetPoint.y, message);
 		}
@@ -187,8 +197,8 @@ while(true){
 After the first replay, I realised that the way I had picked to save the lyrics data was way too slow to work with.
 It was good because it gave me a lot of freedom, but if I wanted to do this again, I had to change it.
 
-The new format was an object which contained arrays that were accessible by the buster id, like this `{"id":[data]}`.
-Now, I had to shorten the lyrics data A LOT, because 20kb for a short replay is too much, so here's what I did:
+The new format was an object which contained arrays that were accessible through the buster id, like this `{"id":[data]}`.
+Now, I had to shorten the lyrics data A LOT, because 20kb for a short replay is way too much, so here's what I did:
 `"id":[ [startTurn, endTurn, "message"] ]`
 
 {% highlight javascript linenos %}
