@@ -37,7 +37,7 @@ I also spent some time with my friend, speculating what the game would be about,
 ## The Game
 
 The game is played on a `16001` by `9001` field. There are `2` teams, one starts at the top-left corner and the other at the bottom-right.
-Each team starts with the same amount of busters, where the number can be from `2-4`.
+Each team starts with the same amount of busters, where the number can be from `2-5`.
 There are ghosts scattered around the map, each ghost has a stamina of either `3, 15 or 40`.
 
 The map has a fog of war which means that your team can only see what is `2200` units away from your busters.
