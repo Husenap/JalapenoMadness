@@ -273,9 +273,14 @@ We have yet to know what we can learn from the next CG contest, [HyperSonic](htt
 
 I'm very excited about it, expect me in the arena! ;)
 
+## Extras
+
+If you're interested in knowing how I made my replays, then you can read about that in my other [post]().
+
 
 ## Links
 [Leaderboard](https://www.codingame.com/leaderboards/global/challenge/codebusters/43822519b1074cb4ae44119c1c8f151471d50aa){:.button.lift-3.rippleParent}
 [Replay 1](https://www.codingame.com/replay/110180527){:.button.lift-3.rippleParent}
 [Replay 2](https://www.codingame.com/replay/111252400){:.button.lift-3.rippleParent}
+[Replay Post](){:.button.lift-3.rippleParent}
 [Amazing Art by TontonRevolver](https://tontonrevolver.artstation.com/){:.button.lift-3.rippleParent}
