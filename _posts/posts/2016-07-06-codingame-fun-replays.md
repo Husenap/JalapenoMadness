@@ -287,16 +287,16 @@ while (true) {
 			if(xOff + 1000*id >= 12000){
 				let radius = id%2!=0?ballRadius-2000:ballRadius;
 				let target = new Point(
-						center.x + radius*Math.cos(ballAngle + id*(Math.PI/5)),
-						center.y + radius*Math.sin(ballAngle + id*(Math.PI/5))
-						);
+					center.x + radius*Math.cos(ballAngle + id*(Math.PI/5)),
+					center.y + radius*Math.sin(ballAngle + id*(Math.PI/5))
+				);
 				target.round();
 				print("MOVE", target.x, target.y, message);
 			}else{
 				let target = new Point(
-						xOff + 1000*id,
-						4500 + Math.sin(snakeAngle+id)*1000
-						);
+					xOff + 1000*id,
+					4500 + Math.sin(snakeAngle+id)*1000
+				);
 				target.round();
 				print("MOVE", target.x, target.y, message);
 			}
@@ -306,9 +306,9 @@ while (true) {
 
 			let angle = id%2==0? lineAngle : lineAngle+Math.PI;
 			let target = new Point(
-					3500 + 1000*id - Math.sin(angle)*500 + (id%2==0?500:-500),
-					center.y + Math.cos(angle)*2000
-					);
+				3500 + 1000*id - Math.sin(angle)*500 + (id%2==0?500:-500),
+				center.y + Math.cos(angle)*2000
+			);
 			target.round();
 			print("MOVE", target.x, target.y, message);
 		}else if(parts["HEART"]()){
@@ -317,9 +317,9 @@ while (true) {
 
 			let t = heartAngle + id*(Math.PI/5);
 			let target = new Point(
-					center.x + heartSize*(16*Math.pow(Math.sin(t), 3)),
-					center.y - heartSize*(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))
-					);
+				center.x + heartSize*(16*Math.pow(Math.sin(t), 3)),
+				center.y - heartSize*(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))
+			);
 			target.round();
 			print("MOVE", target.x, target.y, message);
 		}
