@@ -27,7 +27,7 @@ This is a very fun way of seeing how you progress through the contest.
 
 ### Full Report
 
-If you want to read the [full report](https://www.codingame.com/blog/en/2016/07/codebusters-contest-report.html) of the game with a more detailed description of the game, please do so on the CodinGame website.
+If you want to read the [full report](https://www.codingame.com/blog/en/2016/07/codebusters-contest-report.html) with a more detailed description of the game, please do so on the CodinGame website.
 
 
 ## Preparation
