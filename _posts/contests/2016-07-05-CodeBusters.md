@@ -25,6 +25,10 @@ The most recent contests have been 8 days long, and there's a fairly new league 
 You start out at the far left, in the wood league, and have to work your way up to the top by ranking better than the boss in the arena.
 This is a very fun way of seeing how you progress through the contest.
 
+### Full Report
+
+If you want to read the [full report](https://www.codingame.com/blog/en/2016/07/codebusters-contest-report.html) of the game with a more detailed description of the game, please do so on the CodinGame website.
+
 
 ## Preparation
 
