@@ -13,7 +13,7 @@ layout: default
 	{% assign posts = site.posts | where:"tag",page.type %}
 	{% for post in posts %}
 		<div class="post-link-wrapper">
-			<a class="post-link rippleParent" href="{{ post.url | prepend: site.baseurl }}">
+			<a class="post-link rippleParent meshPattern" href="{{ post.url | prepend: site.baseurl }}">
 				<li class="post">
 					<h2>
 						{{ post.title }}

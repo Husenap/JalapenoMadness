@@ -138,7 +138,7 @@
 .site-footer {
 	padding: $space 0;
 	background: $color500;
-	background-image: url(/static/img/site/meshPattern.png);
+	@extend %meshPattern;
 }
 .footer-heading {
 	@extend %font-title;
@@ -228,7 +228,6 @@
 .post-link {
 	display: inline-block;
 	background-color: $theme4;
-	background-image: url(/static/img/site/meshPattern.png);
 	padding: 1rem;
 
 	@include set-z(1);

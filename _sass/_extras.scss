@@ -19,6 +19,12 @@
 	image-rendering: pixelated;
 }
 
+.meshPattern,
+%meshPattern{
+	background-image: url(/static/img/site/meshPattern.png);
+	background-position: 100px 100px;
+}
+
 
 // RIPPLE EFFECT
 .rippleParent {
