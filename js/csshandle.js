@@ -48,28 +48,3 @@ function handleRipple(_parent, e, _class){
 
 	console.log(parseFloat(getComputedStyle(ripple[0])['animationDuration'])*1000);
 }
-
-//MESH FRAGMENTS BEHAVIOUR
-$(".meshPattern").each(function(n){
-	$(this).attr("dx", 2*Math.random()-1);
-	$(this).attr("dy", 2*Math.random()-1);
-	console.log(n, this);
-});
-
-let animation = window.requestAnimationFrame(loop);
-let x, y, dx, dy;
-function loop(){
-	animation = window.requestAnimationFrame(loop);
-	$(".meshPattern").each(function(n){
-		if(!$(this).is(":hover"))return;
-		dx = +$(this).attr("dx");
-		dy = +$(this).attr("dy");
-		x = +$(this).css("background-position-x").slice(0,-2);
-		y = +$(this).css("background-position-y").slice(0,-2);
-		x += dx*50;
-		y += dy*50;
-		$(this).css("background-position-x", x+"px");
-		$(this).css("background-position-y", y+"px");
-		console.log("here", x, y);
-	});
-}
