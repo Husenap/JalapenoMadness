@@ -53,7 +53,7 @@
 //NAV BAR
 .site-nav-row {
 	position: fixed;
-	background: $color500;
+	background-color: $color500;
 	top: 0;
 	left: 0;
 	width: 100%;
@@ -138,6 +138,7 @@
 .site-footer {
 	padding: $space 0;
 	background: $color500;
+	background-image: url(/static/img/site/meshPattern.png);
 }
 .footer-heading {
 	@extend %font-title;
@@ -226,7 +227,8 @@
 }
 .post-link {
 	display: inline-block;
-	background: $theme4;
+	background-color: $theme4;
+	background-image: url(/static/img/site/meshPattern.png);
 	padding: 1rem;
 
 	@include set-z(1);
@@ -234,6 +236,7 @@
 
 	&:hover {
 		@include set-z(3);
+		background-color: $color800;
 		h2 {
 			color: rgba($accent200, $primary-text);
 		}
