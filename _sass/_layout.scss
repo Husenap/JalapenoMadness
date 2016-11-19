@@ -257,45 +257,44 @@
 }
 
 //ARTICLE STUFF
+[class*="left-"] {
+	float: left;
+	margin: 1rem;
+	margin-left: 0 !important;
+}
+[class*="right-"] {
+	float: right;
+	margin: 1rem;
+	margin-right: 0 !important;
+}
+[class*="-half"] {
+	margin: 1rem;
+	width: 50%;
+}
+[class*="-quarter"] {
+	margin: 1rem;
+	width: 25%;
+}
+.clearboth {
+	clear: both;
+}
+@include media-query($on-laptop) {
+	margin: 0.5rem 0;
+}
+@include media-query($on-palm) {
+	[class*="-half"] {
+		width: 100%;
+		margin: 0.2rem 0;
+		float: none;
+	}
+	[class*="-quarter"] {
+		width: 50%;
+	}
+}
 .post-content {
 	img {
 		box-sizing: border-box;
 		margin: 1rem 0;
-
-		&[class*="left-"] {
-			float: left;
-			margin: 1rem;
-			margin-left: 0 !important;
-		}
-		&[class*="right-"] {
-			float: right;
-			margin: 1rem;
-			margin-right: 0 !important;
-		}
-		&[class*="-half"] {
-			margin: 1rem;
-			width: 50%;
-		}
-		&[class*="-quarter"] {
-			margin: 1rem;
-			width: 25%;
-		}
-		&.clearboth {
-			clear: both;
-		}
-		@include media-query($on-laptop) {
-			margin: 0.5rem 0;
-		}
-		@include media-query($on-palm) {
-			&[class*="-half"] {
-				width: 100%;
-				margin: 0.2rem 0;
-				float: none;
-			}
-			&[class*="-quarter"] {
-				width: 50%;
-			}
-		}
 	}
 
 	.table-of-contents {

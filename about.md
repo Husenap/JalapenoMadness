@@ -9,25 +9,28 @@ order: 3
 # Hello and welcome to my blog!
 ---
 
-My name is **Hussein Taher**, I'm **<span id="myAge"></span>**, I live in Malmö, Sweden and I love programming.
+<script type="text/javascript" src="https://platform.linkedin.com/badges/js/profile.js" async defer></script>
+<div class="LI-profile-badge right-" data-version="v1" data-size="small" data-locale="en_US" data-type="vertical" data-theme="dark" data-vanity="hussein-taher-5b279a132"><a class="LI-simple-link" href='https://se.linkedin.com/in/hussein-taher-5b279a132?trk=profile-badge'>Hussein Taher</a></div>
 
-I started programming late 2013 and I've been programming almost every day ever since.
-I used to love game jams because it was a great way for me to meet people, learn new things and develop my skills.
-If it wasn't for the people I've met, I might not be where I am today.
+My name is **Hussein Taher**, I'm a programmer from Malmö, Sweden. I'm currently studying *Game Programming* at [The Game Assembly](http://www.thegameassembly.com/).
+
+## Skills
+
+**Programming Languages:**
+
+- **Very Well** - C++, Javascript
+- **Well** - C, C#, Java, PHP, Lua
+- **OK** - python
+
+**Software/Tools:**
+
+- **Very Well** - Microsoft Visual Studio
+- **Well** - Vim, Adobe Photoshop
+
 
 ## Dreams
 
-For a very long time, my biggest dream was to learn programming, and in the future, get a job at Ubisoft Montpellier because that's where Rayman was born.
-Rayman has been my favourite game my entire life and it still is, so I think it would've been amazing to work with it.
-
-
-
-
-<script type="text/javascript">
-	function _calculateAge(birthday) { // birthday is a date
-		var ageDifMs = Date.now() - birthday.getTime();
-		var ageDate = new Date(ageDifMs); // miliseconds from epoch
-		return Math.abs(ageDate.getUTCFullYear() - 1970);
-	}
-	document.getElementById("myAge").innerText = _calculateAge(new Date("1997-11-02"));
-</script>
+For a very long time, my biggest dream has been to learn programming, and in the future, I would love to get a job at Ubisoft Montpellier because that's where Rayman was born.
+Rayman has been my favourite game my entire life and it still is, so I think it would've been amazing to work on that.
+Rayman is such a joyful game and I can't imagine how wonderful it must've been to develop it.
+That's also why I want to work with games and why I'm so passionate about it, because the joy and happiness that you get once you see what you've created cannot be found anywhere else!
