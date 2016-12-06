@@ -1,4 +1,5 @@
 MAX=64;
+PI2 = Math.PI*2;
 
 function Saw(t)
 {
@@ -13,7 +14,6 @@ onload = function update(){
 		frame = 0;
 		timeNextFrame = 0;
 
-		bpm = 128;
 		str = "";
 		s = !a.src;
 	}
@@ -22,15 +22,7 @@ onload = function update(){
 	while(time < currentTime){
 		while(time < timeNextFrame){
 			if(s){
-				frac = (time*(bpm/64|0)) % 1;
-
-
-				v = 0.4*Saw(time * bpm/5);
-				v += 0.3*Saw(time * bpm/2.01);
-				v += 0.2*Saw(time * bpm/4.025);
-				v += 0.1*Saw(time * bpm/1.03);
-
-
+				v =  Saw(time * 40);
 
 				str += String.fromCharCode(v*32 + 127);
 			}
@@ -48,4 +40,4 @@ onload = function update(){
 		a.play();
 		time = 0;
 	}
-}
+};
