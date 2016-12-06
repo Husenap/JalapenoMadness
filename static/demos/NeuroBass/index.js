@@ -3,7 +3,7 @@ PI2 = Math.PI*2;
 
 function Saw(t)
 {
-	return t%1;
+	return (t%1)*2-1;
 }
 
 onload = function update(){
@@ -22,9 +22,11 @@ onload = function update(){
 	while(time < currentTime){
 		while(time < timeNextFrame){
 			if(s){
-				v =  Saw(time * 40);
+				v  = 0.5*Saw(time * 40);
+				//v += 0.3*Saw(time * 41);
+				//v += 0.3*Math.sin(time * 40);
 
-				str += String.fromCharCode(v*32 + 127);
+				str += String.fromCharCode(v*16 + 127);
 			}
 			time += 1/16384;
 		}
