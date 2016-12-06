@@ -23,8 +23,8 @@ onload = function update(){
 		while(time < timeNextFrame){
 			if(s){
 				v  = 0.5*Saw(time * 40);
-				//v += 0.3*Saw(time * 41);
-				//v += 0.3*Math.sin(time * 40);
+				v += 0.3*Saw(time * 41);
+				v += 0.3*Math.sin(time * 40);
 
 				str += String.fromCharCode(v*16 + 127);
 			}
