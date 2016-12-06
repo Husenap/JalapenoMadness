@@ -1,52 +1,23 @@
-MAX=64;
-PI2 = Math.PI*2;
+var AudioContext = window.AudioContext || window.webkitAudioContext;
 
-function Saw(t)
-{
-	return (t%1)*2-1;
-}
+var audioCtx = new AudioContext();
 
-function Dist(t, p, e)
-{
-	return 2-Math.exp(-e*(t%(Math.PI/p)));
-}
+var saw1 = audioCtx.createOscillator();
+var saw2 = audioCtx.createOscillator();
+var sine = audioCtx.createOscillator();
 
-onload = function update(){
-	requestAnimationFrame(update);
+saw1.type = saw2.type = "sawtooth";
+saw1.frequency.value = 40;
+saw2.frequency.value = 41;
 
-	if(!window.time){
-		time = 0;
-		frame = 0;
-		timeNextFrame = 0;
+sine.type = "sine";
+sine.frequency.value = 40;
 
-		str = "";
-		s = !a.src;
-	}
+saw1.connect(audioCtx.destination);
+saw2.connect(audioCtx.destination);
+sine.connect(audioCtx.destination);
 
-	currentTime = s ? MAX : a.currentTime;
-	while(time < currentTime){
-		while(time < timeNextFrame){
-			if(s){
-				v  = 0.5*Saw(time * 40);
-				v += 0.3*Saw(time * 41);
-				v += 0.3*Math.sin(time * 40);
+saw1.start();
+saw2.start();
+sine.start();
 
-				v *= Dist(time, 40, 30);
-
-				str += String.fromCharCode(v*16 + 127);
-			}
-			time += 1/16384;
-		}
-		frame++;
-		timeNextFrame += 1/60;
-	}
-
-	if(s){
-		a.src = 'data:audio/wav;base64,'+
-				'UklGRiQAAABXQVZFZm10IBAAAAABAAEAA'+
-				'EAAAABA'+
-				'AAABAAgAZGF0YQAAAAAA' + btoa(str);
-		a.play();
-		time = 0;
-	}
-};
