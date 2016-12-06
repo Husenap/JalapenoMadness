@@ -30,15 +30,6 @@ onload = function update(){
 				v += 0.2*Saw(time * bpm/4.025);
 				v += 0.1*Saw(time * bpm/1.03);
 
-				v += 0.2*v*v*v;
-				v *= 0.9 + 0.1*Math.cos(140.0*time);
-				v = 2.0*v*Math.exp(-22.0*time) + v;
-
-				v *= Saw(Math.exp(time)) * Math.exp(-time*time*time*time*time*0.00005);
-
-				//v += 0.2*v*v*v;
-				//v *= 0.9 + 0.1*Math.cos(70.0*time);
-				//v = 2.0*v*Math.exp(-22.0*time) + v;
 
 
 				str += String.fromCharCode(v*32 + 127);
