@@ -9,8 +9,8 @@ order: 3
 # Hello and welcome to my blog!
 ---
 
-<script type="text/javascript" src="https://platform.linkedin.com/badges/js/profile.js" async defer></script>
-<div class="LI-profile-badge right-" data-version="v1" data-size="small" data-locale="en_US" data-type="vertical" data-theme="dark" data-vanity="hussein-taher-5b279a132"><a class="LI-simple-link" href='https://se.linkedin.com/in/hussein-taher-5b279a132?trk=profile-badge'>Hussein Taher</a></div>
+<script src="https://platform.linkedin.com/badges/js/profile.js" async defer type="text/javascript"></script>
+<div class="badge-base LI-profile-badge right-" data-locale="en_US" data-size="medium" data-theme="dark" data-type="VERTICAL" data-vanity="husenap" data-version="v1"><a class="badge-base__link LI-simple-link" href="https://se.linkedin.com/in/husenap?trk=profile-badge">Hussein Taher</a></div>
 
 My name is **Hussein Taher**, I'm a programmer from Malmö, Sweden. I'm currently studying *Game Programming* at [The Game Assembly](http://www.thegameassembly.com/).
 
